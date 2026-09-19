@@ -1,0 +1,625 @@
+"use client";
+
+import React, { useState, useRef } from "react";
+import { Category } from "@/types/inventory";
+import {
+  invoiceParserService,
+  MatchedInvoiceItem,
+  InvoiceImportResult,
+} from "@/services/invoiceParserService";
+import { formatINR } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import {
+  FileText,
+  UploadCloud,
+  CheckCircle2,
+  AlertCircle,
+  ArrowRight,
+  Sparkles,
+  Boxes,
+  X,
+  Trash2,
+  FileCheck,
+  RefreshCw,
+  Plus,
+} from "lucide-react";
+
+interface InvoiceUploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  shopId: string;
+  categories: Category[];
+  onImportSuccess: (result: InvoiceImportResult) => void;
+}
+
+export function InvoiceUploadModal({
+  isOpen,
+  onClose,
+  shopId,
+  categories,
+  onImportSuccess,
+}: InvoiceUploadModalProps) {
+  const [step, setStep] = useState<"upload" | "review">("upload");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  // Extracted data state
+  const [invoiceNumber, setInvoiceNumber] = useState<string>("");
+  const [supplierName, setSupplierName] = useState<string>("");
+  const [invoiceDate, setInvoiceDate] = useState<string>("");
+  const [items, setItems] = useState<MatchedInvoiceItem[]>([]);
+  const [filterMode, setFilterMode] = useState<"all" | "updates" | "new">("all");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (!isOpen) return null;
+
+  const handleReset = () => {
+    setStep("upload");
+    setIsProcessing(false);
+    setErrorMessage(null);
+    setItems([]);
+    setInvoiceNumber("");
+    setSupplierName("");
+  };
+
+  const handleClose = () => {
+    handleReset();
+    onClose();
+  };
+
+  // Process uploaded file
+  const processFile = async (file: File) => {
+    setErrorMessage(null);
+    setIsProcessing(true);
+
+    try {
+      const res = await invoiceParserService.uploadAndParsePdf(file);
+      if (!res.success || !res.items || res.items.length === 0) {
+        setErrorMessage(
+          res.error || "No readable product line items could be detected in this invoice PDF."
+        );
+        setIsProcessing(false);
+        return;
+      }
+
+      setInvoiceNumber(res.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`);
+      setSupplierName(res.supplierName || "Supplier Invoice");
+      setInvoiceDate(res.date || new Date().toISOString().split("T")[0]);
+
+      // Match against existing products
+      const matched = invoiceParserService.matchInvoiceItems(shopId, res.items);
+      setItems(matched);
+      setStep("review");
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to process PDF file.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Load sample invoice for immediate verification
+  const handleLoadSample = () => {
+    setErrorMessage(null);
+    setIsProcessing(true);
+
+    setTimeout(() => {
+      const sample = invoiceParserService.getSampleInvoiceData();
+      setInvoiceNumber(sample.invoiceNumber);
+      setSupplierName(sample.supplierName);
+      setInvoiceDate(sample.date);
+
+      const matched = invoiceParserService.matchInvoiceItems(shopId, sample.items);
+      setItems(matched);
+      setStep("review");
+      setIsProcessing(false);
+    }, 400);
+  };
+
+  // Drag & drop handlers
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
+  // Item update handlers in review table
+  const updateItem = (id: string, updates: Partial<MatchedInvoiceItem>) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        const updated = { ...item, ...updates };
+        if (updates.quantity !== undefined) {
+          updated.newStock = updated.currentStock + (Number(updates.quantity) || 0);
+        }
+        return updated;
+      })
+    );
+  };
+
+  const toggleSelectAll = (select: boolean) => {
+    setItems((prev) => prev.map((item) => ({ ...item, selected: select })));
+  };
+
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Commit and apply
+  const handleCommit = () => {
+    const selectedItems = items.filter((i) => i.selected);
+    if (selectedItems.length === 0) {
+      setErrorMessage("Please select at least one product item to import.");
+      return;
+    }
+
+    setIsProcessing(true);
+    const res = invoiceParserService.commitInvoiceImport(
+      shopId,
+      selectedItems,
+      invoiceNumber,
+      supplierName
+    );
+
+    setIsProcessing(false);
+    onImportSuccess(res);
+    handleClose();
+  };
+
+  // Counts
+  const updateCount = items.filter((i) => i.action === "UPDATE_STOCK").length;
+  const newCount = items.filter((i) => i.action === "CREATE_PRODUCT").length;
+  const selectedCount = items.filter((i) => i.selected).length;
+
+  const filteredItems = items.filter((item) => {
+    if (filterMode === "updates") return item.action === "UPDATE_STOCK";
+    if (filterMode === "new") return item.action === "CREATE_PRODUCT";
+    return true;
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+      <div
+        className={`w-full bg-white rounded-2xl shadow-2xl border border-zinc-200 overflow-hidden flex flex-col transition-all duration-200 my-8 ${
+          step === "review" ? "max-w-5xl max-h-[90vh]" : "max-w-xl"
+        }`}
+      >
+        {/* Header */}
+        <div className="px-5 py-4 bg-zinc-900 text-white flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+              <FileText className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold tracking-tight">
+                {step === "upload" ? "Upload Billing & Invoice PDF" : "Review Invoice Line Items"}
+              </h2>
+              <p className="text-[11px] text-zinc-400">
+                {step === "upload"
+                  ? "Auto-extract products, update existing stock, and review new SKUs"
+                  : `${invoiceNumber || "Invoice"} • ${supplierName || "Supplier"}`}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Error Banner */}
+        {errorMessage && (
+          <div className="px-5 py-3 bg-red-50 border-b border-red-200 text-xs text-red-700 font-medium flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-red-500 hover:text-red-800 font-bold ml-2"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* Body Step 1: Upload Dropzone */}
+        {step === "upload" && (
+          <div className="p-6 space-y-5">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-all ${
+                dragOver
+                  ? "border-emerald-500 bg-emerald-50/50"
+                  : "border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 hover:border-zinc-300"
+              }`}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                <UploadCloud className="w-6 h-6" />
+              </div>
+
+              <h3 className="text-sm font-bold text-zinc-900">
+                Drag and drop your Supplier Invoice PDF here
+              </h3>
+              <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
+                Upload distributor delivery slips, wholesale bills, or GST tax invoices (PDF format
+                up to 10MB).
+              </p>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) processFile(f);
+                }}
+              />
+
+              <div className="mt-5 flex items-center justify-center gap-3">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={isProcessing}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs font-semibold gap-1.5 shadow-2xs"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  {isProcessing ? "Processing PDF..." : "Browse PDF File"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Demo Invoice Button */}
+            <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                  ⚡
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-zinc-800">
+                    Try with Demo Wholesale Bill
+                  </div>
+                  <div className="text-[11px] text-zinc-500">
+                    Instantly load a realistic 5-item invoice to test stock updates and new product
+                    review.
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLoadSample}
+                disabled={isProcessing}
+                className="text-xs font-semibold shrink-0"
+              >
+                Load Sample
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Body Step 2: Interactive Review Table */}
+        {step === "review" && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Review Summary Bar */}
+            <div className="p-4 bg-zinc-50 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <Badge variant="healthy" dot>
+                  {updateCount} Existing SKUs (Stock Update)
+                </Badge>
+                <Badge variant="warning" dot>
+                  {newCount} New SKUs (Needs Review)
+                </Badge>
+              </div>
+
+              {/* View Filters */}
+              <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-zinc-200 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setFilterMode("all")}
+                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+                    filterMode === "all"
+                      ? "bg-zinc-900 text-white font-semibold"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  All Items ({items.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterMode("updates")}
+                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+                    filterMode === "updates"
+                      ? "bg-zinc-900 text-white font-semibold"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  Stock Updates ({updateCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterMode("new")}
+                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+                    filterMode === "new"
+                      ? "bg-zinc-900 text-white font-semibold"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  New Products ({newCount})
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Table Area */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-zinc-50 border-b border-zinc-200 text-[10px] uppercase font-mono text-zinc-500 font-bold sticky top-0 z-10">
+                  <tr>
+                    <th className="py-2.5 px-3 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={items.length > 0 && items.every((i) => i.selected)}
+                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        className="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                    </th>
+                    <th className="py-2.5 px-3">Product Name & SKU</th>
+                    <th className="py-2.5 px-3">Action</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3 text-center">Invoiced Qty</th>
+                    <th className="py-2.5 px-3 text-center">Stock Preview</th>
+                    <th className="py-2.5 px-3 text-right">Cost Price</th>
+                    <th className="py-2.5 px-3 text-right">Selling Price</th>
+                    <th className="py-2.5 px-2 w-8 text-center"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {filteredItems.map((item) => {
+                    const isUpdate = item.action === "UPDATE_STOCK";
+                    const marginPct =
+                      item.sellingPrice > 0
+                        ? Math.round(
+                            ((item.sellingPrice - item.costPrice) / item.sellingPrice) * 100
+                          )
+                        : 0;
+
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`hover:bg-zinc-50/70 transition-colors ${
+                          !item.selected ? "opacity-50 bg-zinc-50/30" : ""
+                        }`}
+                      >
+                        {/* Checkbox */}
+                        <td className="py-3 px-3 text-center">
+                          <input
+                            type="checkbox"
+                            checked={item.selected}
+                            onChange={(e) => updateItem(item.id, { selected: e.target.checked })}
+                            className="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          />
+                        </td>
+
+                        {/* Name & SKU */}
+                        <td className="py-3 px-3 min-w-[200px]">
+                          {isUpdate ? (
+                            <div>
+                              <div className="font-bold text-zinc-900">{item.name}</div>
+                              <div className="text-[10px] font-mono text-zinc-400">
+                                SKU: <span className="text-zinc-600 font-semibold">{item.sku}</span>{" "}
+                                • {item.unit}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <input
+                                type="text"
+                                value={item.name}
+                                onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                                className="w-full h-7 px-2 font-bold text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                placeholder="Product Name"
+                              />
+                              <div className="flex items-center gap-1 text-[10px] font-mono text-zinc-400">
+                                <span>SKU:</span>
+                                <input
+                                  type="text"
+                                  value={item.sku}
+                                  onChange={(e) => updateItem(item.id, { sku: e.target.value })}
+                                  className="h-5 px-1.5 font-mono text-[10px] rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 uppercase"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Action Badge */}
+                        <td className="py-3 px-3 whitespace-nowrap">
+                          {isUpdate ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              Update Stock
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                              <Plus className="w-3 h-3 text-amber-600" />
+                              New Product
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Category */}
+                        <td className="py-3 px-3">
+                          {isUpdate ? (
+                            <span className="text-zinc-600 text-xs">{item.categoryName || "General"}</span>
+                          ) : (
+                            <select
+                              value={item.categoryId}
+                              onChange={(e) =>
+                                updateItem(item.id, {
+                                  categoryId: e.target.value,
+                                  categoryName:
+                                    categories.find((c) => c.id === e.target.value)?.name ||
+                                    "General",
+                                })
+                              }
+                              className="h-7 px-2 text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            >
+                              {categories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.name}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </td>
+
+                        {/* Invoiced Quantity */}
+                        <td className="py-3 px-3 text-center">
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateItem(item.id, {
+                                quantity: Math.max(1, parseInt(e.target.value) || 1),
+                              })
+                            }
+                            className="w-16 h-7 px-1 text-center font-mono font-bold text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </td>
+
+                        {/* Stock Preview */}
+                        <td className="py-3 px-3 text-center font-mono whitespace-nowrap">
+                          {isUpdate ? (
+                            <div className="flex items-center justify-center gap-1 text-xs">
+                              <span className="text-zinc-500 font-medium">{item.currentStock}</span>
+                              <span className="text-zinc-400">+</span>
+                              <span className="text-emerald-700 font-bold">{item.quantity}</span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400" />
+                              <span className="font-extrabold text-zinc-900 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">
+                                {item.newStock}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+                              Initial: {item.quantity}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Cost Price */}
+                        <td className="py-3 px-3 text-right">
+                          <div className="inline-flex items-center gap-0.5">
+                            <span className="text-[11px] font-mono text-zinc-400">₹</span>
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.costPrice}
+                              onChange={(e) =>
+                                updateItem(item.id, {
+                                  costPrice: Math.max(0, parseFloat(e.target.value) || 0),
+                                })
+                              }
+                              className="w-20 h-7 px-1 text-right font-mono text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                          </div>
+                        </td>
+
+                        {/* Selling Price & Margin */}
+                        <td className="py-3 px-3 text-right">
+                          <div className="flex flex-col items-end gap-0.5">
+                            <div className="inline-flex items-center gap-0.5">
+                              <span className="text-[11px] font-mono text-zinc-400">₹</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.sellingPrice}
+                                onChange={(e) =>
+                                  updateItem(item.id, {
+                                    sellingPrice: Math.max(0, parseFloat(e.target.value) || 0),
+                                  })
+                                }
+                                className="w-20 h-7 px-1 text-right font-mono font-bold text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+                            <span
+                              className={`text-[10px] font-mono font-bold px-1 rounded ${
+                                marginPct >= 20
+                                  ? "text-emerald-700 bg-emerald-50"
+                                  : marginPct >= 0
+                                  ? "text-blue-700 bg-blue-50"
+                                  : "text-red-700 bg-red-50"
+                              }`}
+                            >
+                              {marginPct >= 0 ? `+${marginPct}%` : `${marginPct}%`} margin
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Delete Row */}
+                        <td className="py-3 px-2 text-center">
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.id)}
+                            title="Exclude this item from import"
+                            className="p-1 text-zinc-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer Action Bar */}
+            <div className="p-4 bg-zinc-50 border-t border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+              <div className="text-xs text-zinc-600 font-medium">
+                Selected: <strong className="text-zinc-900">{selectedCount}</strong> of{" "}
+                <strong>{items.length}</strong> items to import into store
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setStep("upload")}
+                  className="text-xs font-semibold"
+                >
+                  Upload Another
+                </Button>
+
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleCommit}
+                  disabled={isProcessing || selectedCount === 0}
+                  className="text-xs font-bold gap-1.5 shadow-2xs"
+                >
+                  <FileCheck className="w-4 h-4" />
+                  {isProcessing
+                    ? "Applying Updates..."
+                    : `Apply Import & Update Stock (${selectedCount})`}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
