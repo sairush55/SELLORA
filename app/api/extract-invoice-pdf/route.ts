@@ -43,10 +43,11 @@ function normalizeUnit(unitStr: string): string {
   return "Units";
 }
 
-// Clean number strings (e.g. "1,250.00", "₹720", "Rs. 45")
-function parseNumeric(val: string | undefined): number {
-  if (!val) return 0;
-  const cleaned = val.replace(/[^0-9.]/g, "");
+// Clean number strings (e.g. "1,250.00", "₹720", "Rs. 45") or existing numbers
+function parseNumeric(val: number | string | undefined | null): number {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  const cleaned = String(val).replace(/[^0-9.]/g, "");
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
 }
@@ -229,10 +230,151 @@ function isExcludedLine(line: string): boolean {
     l.includes("bill of supply") ||
     l.includes("delivery challan") ||
     l.includes("original for recipient") ||
-    l.includes("duplicate for transporter") ||
-    (l.includes("description") && (l.includes("qty") || l.includes("rate") || l.includes("hsn"))) ||
-    (l.includes("sl no") && (l.includes("particulars") || l.includes("description")))
+    l.includes("duplicate for transporter")
   );
+}
+
+// Table Header Column Mapping
+interface TableHeaderMap {
+  totalCols: number;
+  hasSerialCol: boolean;
+  nameIdx: number;
+  hsnIdx: number;
+  qtyIdx: number;
+  rateIdx: number;
+  mrpIdx: number;
+  unitIdx: number;
+  amountIdx: number;
+  taxableIdx: number;
+}
+
+// Check if a line represents an invoice table header
+function isTableHeaderLine(line: string): boolean {
+  const l = line.toLowerCase();
+  const hasName = /description|particulars|items?|products?|goods|desc\b/i.test(l);
+  const hasQty = /\b(?:qty|quantity|quantities|billed\s*qty|invoiced\s*qty|nos|count)\b/i.test(l);
+  const hasRate = /\b(?:rate|price|unit\s*price|cost|basic\s*rate|basic\s*price|mrp)\b/i.test(l);
+  const hasAmount = /\b(?:amount|total|value|taxable)\b/i.test(l);
+  const hasHsn = /\b(?:hsn|sac)\b/i.test(l);
+
+  return (hasName && (hasQty || hasRate || hasHsn || hasAmount)) || (hasQty && hasRate);
+}
+
+// Map column indices from table header line
+function mapHeaderColumns(line: string, delimiter: string): TableHeaderMap {
+  let cols: string[] = [];
+  if (delimiter === "pipe") cols = line.split("|");
+  else if (delimiter === "tab") cols = line.split("\t");
+  else if (delimiter === "multispace") cols = line.split(/\s{2,}/);
+  else if (delimiter === "comma") cols = line.split(",");
+  else cols = line.split(/\s{2,}|\t+|\|/);
+
+  cols = cols.map((c) => c.trim().toLowerCase()).filter(Boolean);
+
+  const mapping: TableHeaderMap = {
+    totalCols: cols.length,
+    hasSerialCol: false,
+    nameIdx: -1,
+    hsnIdx: -1,
+    qtyIdx: -1,
+    rateIdx: -1,
+    mrpIdx: -1,
+    unitIdx: -1,
+    amountIdx: -1,
+    taxableIdx: -1,
+  };
+
+  cols.forEach((col, idx) => {
+    if (/^(?:sl\.?\s*no\.?|sr\.?\s*no\.?|s\.?\s*no\.?|#)$/i.test(col)) {
+      mapping.hasSerialCol = true;
+    } else if (mapping.nameIdx === -1 && /description|particulars|item|product|goods/i.test(col)) {
+      mapping.nameIdx = idx;
+    } else if (mapping.hsnIdx === -1 && /hsn|sac/i.test(col)) {
+      mapping.hsnIdx = idx;
+    } else if (mapping.qtyIdx === -1 && /\b(?:qty|quantity|quantities|billed\s*qty|invoiced\s*qty|nos|count)\b/i.test(col)) {
+      mapping.qtyIdx = idx;
+    } else if (mapping.rateIdx === -1 && /\b(?:rate|price|unit\s*price|cost|basic\s*rate|basic\s*price)\b/i.test(col)) {
+      mapping.rateIdx = idx;
+    } else if (mapping.mrpIdx === -1 && /\b(?:mrp)\b/i.test(col)) {
+      mapping.mrpIdx = idx;
+    } else if (mapping.unitIdx === -1 && /\b(?:unit|uom|per|pkg)\b/i.test(col)) {
+      mapping.unitIdx = idx;
+    } else if (mapping.amountIdx === -1 && /\b(?:amount|total|value|net\s*amount)\b/i.test(col)) {
+      mapping.amountIdx = idx;
+    } else if (mapping.taxableIdx === -1 && /\b(?:taxable|taxable\s*value|taxable\s*amount)\b/i.test(col)) {
+      mapping.taxableIdx = idx;
+    }
+  });
+
+  return mapping;
+}
+
+// Disambiguate Quantity and Rate with mathematical verification and retail indicators
+function disambiguateQtyAndRate(
+  valA: number | string | undefined,
+  valB: number | string | undefined,
+  strA?: string,
+  strB?: string,
+  lineText?: string,
+  isHeaderMapped: boolean = false
+): { qty: number; rate: number; reason?: string } {
+  let numA = parseNumeric(valA as any);
+  let numB = parseNumeric(valB as any);
+
+  if (numA <= 0 || numB <= 0) {
+    return { qty: Math.max(1, numA || numB), rate: numA > 0 ? numA : numB };
+  }
+
+  const sA = String(strA || valA || "").toLowerCase();
+  const sB = String(strB || valB || "").toLowerCase();
+
+  // 1. Explicit Quantity Unit attached: e.g. "10 Pcs", "5 Bags", "20 Boxes"
+  const unitOnA = /(?:pcs|nos|kg|bag|box|pkt|unit|ltr|btl|can|tin)/i.test(sA);
+  const unitOnB = /(?:pcs|nos|kg|bag|box|pkt|unit|ltr|btl|can|tin)/i.test(sB);
+
+  if (unitOnA && !unitOnB) {
+    return { qty: numA, rate: numB, reason: "unit_on_A" };
+  }
+  if (unitOnB && !unitOnA) {
+    return { qty: numB, rate: numA, reason: "unit_on_B" };
+  }
+
+  // 2. Price indicators: ₹, Rs, @, /-, /unit
+  const priceOnA = /(?:₹|rs\.?|inr|@|\/\-|\/pc|\/kg|\/unit)/i.test(sA);
+  const priceOnB = /(?:₹|rs\.?|inr|@|\/\-|\/pc|\/kg|\/unit)/i.test(sB);
+
+  if (priceOnA && !priceOnB) {
+    return { qty: numB, rate: numA, reason: "price_on_A" };
+  }
+  if (priceOnB && !priceOnA) {
+    return { qty: numA, rate: numB, reason: "price_on_B" };
+  }
+
+  // If header explicitly mapped, respect header order
+  if (isHeaderMapped) {
+    return { qty: numA, rate: numB, reason: "header_mapped" };
+  }
+
+  // 3. Decimals vs Integer:
+  const aHasDecimals = !Number.isInteger(numA);
+  const bHasDecimals = !Number.isInteger(numB);
+
+  if (aHasDecimals && !bHasDecimals) {
+    return { qty: numB, rate: numA, reason: "decimals_on_A" };
+  }
+  if (bHasDecimals && !aHasDecimals) {
+    return { qty: numA, rate: numB, reason: "decimals_on_B" };
+  }
+
+  // 4. Magnitude heuristic: In retail, Rate is typically greater than Quantity
+  if (numA > numB && numB <= 100 && numA >= 50) {
+    return { qty: numB, rate: numA, reason: "magnitude_A_greater" };
+  }
+  if (numB > numA && numA <= 100 && numB >= 50) {
+    return { qty: numA, rate: numB, reason: "magnitude_B_greater" };
+  }
+
+  return { qty: numA, rate: numB, reason: "default" };
 }
 
 // Universal Multi-Strategy Invoice Parser
@@ -339,9 +481,26 @@ function parseInvoiceText(rawText: string): {
     return true;
   };
 
+  let activeHeaderMap: TableHeaderMap | null = null;
+
   // 2. Iterate through lines with multi-strategy parsing
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // Check if line is a table header
+    if (isTableHeaderLine(line)) {
+      let delim: "pipe" | "tab" | "multispace" | "comma" | null = null;
+      if (line.includes("|")) delim = "pipe";
+      else if (line.includes("\t")) delim = "tab";
+      else if (/\s{2,}/.test(line)) delim = "multispace";
+      else if (line.includes(",") && (line.match(/,/g) || []).length >= 3) delim = "comma";
+
+      if (delim) {
+        activeHeaderMap = mapHeaderColumns(line, delim);
+      }
+      continue;
+    }
+
     if (isExcludedLine(line)) continue;
 
     // -------------------------------------------------------------
@@ -363,9 +522,49 @@ function parseInvoiceText(rawText: string): {
       cols = cols.map((c) => c.trim()).filter(Boolean);
 
       if (cols.length >= 3) {
-        // Find where product description is
+        // Option A: If activeHeaderMap is available and has both rate & qty
+        if (
+          activeHeaderMap &&
+          activeHeaderMap.nameIdx !== -1 &&
+          activeHeaderMap.qtyIdx !== -1 &&
+          activeHeaderMap.rateIdx !== -1
+        ) {
+          const rowHasSerial = /^\d{1,4}[\.\)]?$/.test(cols[0]);
+          let shift = 0;
+          if (rowHasSerial && !activeHeaderMap.hasSerialCol) {
+            shift = 1;
+          }
+
+          const nameColIdx = activeHeaderMap.nameIdx + shift;
+          const qtyColIdx = activeHeaderMap.qtyIdx + shift;
+          const rateColIdx = activeHeaderMap.rateIdx + shift;
+          const unitColIdx =
+            activeHeaderMap.unitIdx !== -1 ? activeHeaderMap.unitIdx + shift : -1;
+          const hsnColIdx =
+            activeHeaderMap.hsnIdx !== -1 ? activeHeaderMap.hsnIdx + shift : -1;
+
+          if (
+            nameColIdx < cols.length &&
+            qtyColIdx < cols.length &&
+            rateColIdx < cols.length
+          ) {
+            const rawName = cols[nameColIdx];
+            const rawQty = cols[qtyColIdx];
+            const rawRate = cols[rateColIdx];
+            const rawUnit =
+              unitColIdx !== -1 && unitColIdx < cols.length ? cols[unitColIdx] : undefined;
+            const hsn =
+              hsnColIdx !== -1 && hsnColIdx < cols.length ? cols[hsnColIdx] : undefined;
+
+            const res = disambiguateQtyAndRate(rawQty, rawRate, rawQty, rawRate, line, true);
+            if (addItem(rawName, res.qty, res.rate, rawUnit, hsn)) {
+              continue;
+            }
+          }
+        }
+
+        // Option B: Fallback column inspection with mathematical factor factorization
         let startIdx = 0;
-        // Skip serial number column (e.g. "1", "2.", "01", "[1]")
         if (/^\d{1,4}[\.\)]?$/.test(cols[0])) {
           startIdx = 1;
         }
@@ -374,56 +573,90 @@ function parseInvoiceText(rawText: string): {
           const rawName = cols[startIdx];
           if (rawName && rawName.length >= 2 && /[a-zA-Z]/.test(rawName)) {
             const rest = cols.slice(startIdx + 1);
-            let hsn: string | undefined;
-            let qty = 0;
+
+            let hsn: string | undefined = undefined;
             let unit = "Units";
-            let rate = 0;
 
-            let r = 0;
-            // Check if rest[0] is HSN code (4 to 8 digit number)
-            if (r < rest.length && /^\d{4,8}$/.test(rest[r])) {
-              hsn = rest[r];
-              r++;
-            }
-
-            // Look for Quantity
-            if (r < rest.length) {
-              const qNum = parseNumeric(rest[r]);
-              if (qNum > 0) {
-                qty = qNum;
-                r++;
+            // Extract candidate numbers from rest
+            const candidateNums: Array<{ num: number; raw: string }> = [];
+            for (let c = 0; c < rest.length; c++) {
+              const colText = rest[c];
+              if (!hsn && c === 0 && /^\d{4,8}$/.test(colText)) {
+                hsn = colText;
+                continue;
+              }
+              if (/^[a-zA-Z]{2,8}$/.test(colText) && !/(?:total|tax|gst|disc|free)/i.test(colText)) {
+                unit = colText;
+                continue;
+              }
+              const num = parseNumeric(colText);
+              if (num > 0) {
+                candidateNums.push({ num, raw: colText });
               }
             }
 
-            // Look for Unit (e.g. "PCS", "PKT", "KG", "BOX", "NOS", "BAG")
-            if (r < rest.length && /^[a-zA-Z]{2,8}$/.test(rest[r])) {
-              unit = rest[r];
-              r++;
-            }
+            if (candidateNums.length >= 2) {
+              let qty = 0;
+              let rate = 0;
 
-            // Look for Rate / Cost
-            if (r < rest.length) {
-              const rNum = parseNumeric(rest[r]);
-              if (rNum > 0) {
-                rate = rNum;
-                r++;
-              }
-            }
+              if (candidateNums.length === 2) {
+                const res = disambiguateQtyAndRate(
+                  candidateNums[0].num,
+                  candidateNums[1].num,
+                  candidateNums[0].raw,
+                  candidateNums[1].raw,
+                  line,
+                  false
+                );
+                qty = res.qty;
+                rate = res.rate;
+              } else {
+                let factorFound = false;
+                for (let tIdx = candidateNums.length - 1; tIdx >= 0; tIdx--) {
+                  const candidateTotal = candidateNums[tIdx].num;
+                  for (let a = 0; a < candidateNums.length; a++) {
+                    if (a === tIdx) continue;
+                    for (let b = a + 1; b < candidateNums.length; b++) {
+                      if (b === tIdx) continue;
+                      const product = candidateNums[a].num * candidateNums[b].num;
+                      if (Math.abs(product - candidateTotal) < Math.max(3, candidateTotal * 0.05)) {
+                        const res = disambiguateQtyAndRate(
+                          candidateNums[a].num,
+                          candidateNums[b].num,
+                          candidateNums[a].raw,
+                          candidateNums[b].raw,
+                          line,
+                          false
+                        );
+                        qty = res.qty;
+                        rate = res.rate;
+                        factorFound = true;
+                        break;
+                      }
+                    }
+                    if (factorFound) break;
+                  }
+                  if (factorFound) break;
+                }
 
-            // If rate was not found yet, inspect remaining columns for numbers
-            if (rate === 0 && r < rest.length) {
-              for (let colIdx = r; colIdx < rest.length; colIdx++) {
-                const val = parseNumeric(rest[colIdx]);
-                if (val > 0) {
-                  rate = val;
-                  break;
+                if (!factorFound) {
+                  const res = disambiguateQtyAndRate(
+                    candidateNums[0].num,
+                    candidateNums[1].num,
+                    candidateNums[0].raw,
+                    candidateNums[1].raw,
+                    line,
+                    false
+                  );
+                  qty = res.qty;
+                  rate = res.rate;
                 }
               }
-            }
 
-            if (qty > 0 && rate > 0) {
-              if (addItem(rawName, qty, rate, unit, hsn)) {
-                continue;
+              if (qty > 0 && rate > 0) {
+                if (addItem(rawName, qty, rate, unit, hsn)) {
+                  continue;
+                }
               }
             }
           }
@@ -437,8 +670,7 @@ function parseInvoiceText(rawText: string): {
     // -------------------------------------------------------------
     if (i < lines.length - 1) {
       const nextLine = lines[i + 1];
-      if (!isExcludedLine(nextLine)) {
-        // Check if nextLine has numeric table columns
+      if (!isExcludedLine(nextLine) && !isTableHeaderLine(nextLine)) {
         const nextTokens = nextLine.split(/\s{2,}|\t+|\|/).map((t) => t.trim()).filter(Boolean);
         const hasTextDescription = nextTokens.some(
           (t) =>
@@ -449,38 +681,37 @@ function parseInvoiceText(rawText: string): {
 
         if (nextTokens.length >= 2 && !hasTextDescription) {
           let hsn: string | undefined;
-          let qty = 0;
           let unit = "Units";
-          let rate = 0;
+          const candidateNums: Array<{ num: number; raw: string }> = [];
 
-          let r = 0;
-          if (/^\d{4,8}$/.test(nextTokens[0])) {
-            hsn = nextTokens[0];
-            r++;
-          }
-          if (r < nextTokens.length) {
-            const q = parseNumeric(nextTokens[r]);
-            if (q > 0) {
-              qty = q;
-              r++;
-            }
-          }
-          if (r < nextTokens.length && /^[a-zA-Z]{2,8}$/.test(nextTokens[r])) {
-            unit = nextTokens[r];
-            r++;
-          }
-          if (r < nextTokens.length) {
-            const rt = parseNumeric(nextTokens[r]);
-            if (rt > 0) {
-              rate = rt;
-              r++;
-            }
-          }
-
-          if (qty > 0 && rate > 0 && line.length >= 2 && /[a-zA-Z]/.test(line)) {
-            if (addItem(line, qty, rate, unit, hsn)) {
-              i++; // Advance past nextLine
+          for (let n = 0; n < nextTokens.length; n++) {
+            const token = nextTokens[n];
+            if (!hsn && n === 0 && /^\d{4,8}$/.test(token)) {
+              hsn = token;
               continue;
+            }
+            if (/^[a-zA-Z]{2,8}$/.test(token)) {
+              unit = token;
+              continue;
+            }
+            const num = parseNumeric(token);
+            if (num > 0) candidateNums.push({ num, raw: token });
+          }
+
+          if (candidateNums.length >= 2) {
+            const res = disambiguateQtyAndRate(
+              candidateNums[0].num,
+              candidateNums[1].num,
+              candidateNums[0].raw,
+              candidateNums[1].raw,
+              line,
+              false
+            );
+            if (res.qty > 0 && res.rate > 0 && line.length >= 2 && /[a-zA-Z]/.test(line)) {
+              if (addItem(line, res.qty, res.rate, unit, hsn)) {
+                i++; // Advance past nextLine
+                continue;
+              }
             }
           }
         }
@@ -505,17 +736,36 @@ function parseInvoiceText(rawText: string): {
 
     // -------------------------------------------------------------
     // STRATEGY 4: Flexible Single-Line Pattern (Spaces + trailing Qty + Rate)
-    // Matches: [Product Name] [Qty] [Unit?] [Rate] [Total?]
+    // Matches: [Product Name] [Qty] [Unit?] [Rate] [Total?] OR [Product Name] [Rate] [Qty] [Total?]
     // -------------------------------------------------------------
-    const flexibleMatch = line.match(
-      /^(?:(\d{1,4})[\.\)\s]+)?([A-Za-z][A-Za-z0-9\s\.\-_/'"&]{2,50}?)\s+(\d+(?:\.\d+)?)\s*([a-zA-Z]{2,6})?\s+(?:₹|Rs\.?)?\s*(\d+(?:,\d+)*(?:\.\d+)?)(?:\s+(?:₹|Rs\.?)?\s*(\d+(?:,\d+)*(?:\.\d+)?))?$/i
-    );
-    if (flexibleMatch) {
-      const rawName = flexibleMatch[2].trim();
-      const qty = parseNumeric(flexibleMatch[3]);
-      const unit = flexibleMatch[4] || "Units";
-      const rate = parseNumeric(flexibleMatch[5]);
-      if (addItem(rawName, qty, rate, unit)) {
+    const trailingRegex = /\s+(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s+(\d+(?:,\d{3})*(?:\.\d{1,2})?)(?:\s+(\d+(?:,\d{3})*(?:\.\d{1,2})?))?$/;
+    const match = line.match(trailingRegex);
+    if (match) {
+      const rawName = line.slice(0, match.index).trim();
+      const val1 = parseNumeric(match[1]);
+      const val2 = parseNumeric(match[2]);
+      const val3 = match[3] ? parseNumeric(match[3]) : 0;
+
+      let qty = 0;
+      let rate = 0;
+
+      if (val3 > 0) {
+        if (Math.abs(val1 * val2 - val3) < Math.max(3, val3 * 0.05)) {
+          const res = disambiguateQtyAndRate(val1, val2, match[1], match[2], line, false);
+          qty = res.qty;
+          rate = res.rate;
+        } else {
+          const res = disambiguateQtyAndRate(val1, val2, match[1], match[2], line, false);
+          qty = res.qty;
+          rate = res.rate;
+        }
+      } else {
+        const res = disambiguateQtyAndRate(val1, val2, match[1], match[2], line, false);
+        qty = res.qty;
+        rate = res.rate;
+      }
+
+      if (addItem(rawName, qty, rate)) {
         continue;
       }
     }
