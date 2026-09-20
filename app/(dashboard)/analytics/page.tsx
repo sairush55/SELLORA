@@ -203,7 +203,7 @@ export default function AnalyticsPage() {
               : "border-transparent text-zinc-500 hover:text-zinc-800"
           }`}
         >
-          <Clock className="w-3.5 h-3.5 text-indigo-600" />
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
           Peak Hours & Inventory Velocity
         </button>
       </div>

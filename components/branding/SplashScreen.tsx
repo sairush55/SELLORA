@@ -64,12 +64,12 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
           onClick={handleDismiss}
           className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-gradient-to-br from-[#060910] via-[#09101c] to-[#04070c] text-white select-none cursor-pointer overflow-hidden"
         >
-          {/* Ambient indigo backlight aura */}
+          {/* Ambient yellow backlight aura */}
           <motion.div
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: [0.8, 1.25, 1], opacity: [0.2, 0.45, 0.3] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute w-[440px] h-[440px] sm:w-[600px] sm:h-[600px] rounded-full bg-indigo-500/20 blur-[130px] pointer-events-none"
+            className="absolute w-[440px] h-[440px] sm:w-[600px] sm:h-[600px] rounded-full bg-amber-500/20 blur-[130px] pointer-events-none"
           />
 
           {/* Subtle grid pattern background */}
@@ -82,7 +82,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
               initial={{ scale: 0.7, opacity: 0, y: 15 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-24 h-24 sm:w-28 sm:h-28 mb-5 drop-shadow-[0_0_35px_rgba(99,102,241,0.4)]"
+              className="relative w-24 h-24 sm:w-28 sm:h-28 mb-5 drop-shadow-[0_0_35px_rgba(234,179,8,0.4)]"
             >
               <svg viewBox="0 0 40 40" fill="none" className="w-full h-full">
                 {/* Block 1: Bottom-Left Base (Charcoal) */}
@@ -98,14 +98,14 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                   transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 />
 
-                {/* Block 2: Bottom-Right (Royal Indigo accent) */}
+                {/* Block 2: Bottom-Right (Vibrant Yellow accent) */}
                 <motion.rect
                   x="22"
                   y="22"
                   width="12"
                   height="12"
                   rx="2.5"
-                  fill="#4f46e5"
+                  fill="#eab308"
                   initial={{ scale: 0, opacity: 0, x: 15 }}
                   animate={{ scale: 1, opacity: 1, x: 0 }}
                   transition={{ duration: 0.55, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
@@ -127,7 +127,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                 {/* Dynamic Intelligence Vector Path (Draws itself smoothly) */}
                 <motion.path
                   d="M18 18L32 6M32 6H24M32 6V14"
-                  stroke="#6366f1"
+                  stroke="#facc15"
                   strokeWidth="3.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -136,12 +136,12 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                   transition={{ duration: 0.75, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 />
 
-                {/* Apex Decision Node (Pulsing Indigo Circle) */}
+                {/* Apex Decision Node (Pulsing Yellow Circle) */}
                 <motion.circle
                   cx="32"
                   cy="6"
                   r="3.5"
-                  fill="#818cf8"
+                  fill="#fef08a"
                   stroke="#09101c"
                   strokeWidth="1.5"
                   initial={{ scale: 0, opacity: 0 }}
@@ -151,7 +151,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
               </svg>
             </motion.div>
 
-            {/* 2. Brand Name Typography: SELLORA with glowing indigo dot */}
+            {/* 2. Brand Name Typography: SELLORA with glowing yellow dot */}
             <div className="flex items-center tracking-tight font-black">
               {["S", "E", "L", "L", "O", "R", "A"].map((letter, idx) => (
                 <motion.span
@@ -169,12 +169,12 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                 </motion.span>
               ))}
 
-              {/* Glowing Indigo Brand Dot */}
+              {/* Glowing Yellow Brand Dot */}
               <motion.span
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: [0, 1.8, 1], opacity: 1 }}
                 transition={{ duration: 0.4, delay: 1.15, ease: "easeOut" }}
-                className="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_14px_rgba(129,140,248,0.9)] ml-1.5 mb-2 inline-block"
+                className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_14px_rgba(234,179,8,0.9)] ml-1.5 mb-2 inline-block"
               />
             </div>
 
@@ -183,7 +183,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
               initial={{ opacity: 0, y: 8, letterSpacing: "0.15em" }}
               animate={{ opacity: 1, y: 0, letterSpacing: "0.28em" }}
               transition={{ duration: 0.6, delay: 1.25, ease: "easeOut" }}
-              className="mt-1 uppercase text-[10px] sm:text-xs font-semibold text-indigo-400/90 font-mono"
+              className="mt-1 uppercase text-[10px] sm:text-xs font-semibold text-amber-400/90 font-mono"
             >
               Retail Intelligence
             </motion.div>
@@ -195,7 +195,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 1.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.6)]"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-300 shadow-[0_0_10px_rgba(234,179,8,0.6)]"
                 />
               </div>
 
@@ -206,7 +206,7 @@ export function SplashScreen({ forceShow = false, onComplete }: SplashScreenProp
                 className="flex items-center justify-between text-[9px] font-mono text-zinc-500"
               >
                 <span>TERMINAL ACTIVE</span>
-                <span className="text-indigo-400 font-bold">READY</span>
+                <span className="text-amber-400 font-bold">READY</span>
               </motion.div>
             </div>
 

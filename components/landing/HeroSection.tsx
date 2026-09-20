@@ -61,7 +61,7 @@ export function HeroSection() {
               <Link href="/signup">
                 <button
                   type="button"
-                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 hover:brightness-110 shadow-accent hover:shadow-accent-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
+                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-extrabold text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 shadow-accent hover:shadow-accent-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <span>Start Managing Your Shop</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

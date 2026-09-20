@@ -120,7 +120,7 @@ export function FeatureGrid() {
                 key={item.label}
                 className="relative p-6 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-brand-500/30 hover:bg-white/[0.06] transition-all group"
               >
-                <div className="font-display text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-indigo-300 to-blue-300 tracking-tight font-normal">
+                <div className="font-display text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-400 tracking-tight font-normal">
                   {item.value}
                 </div>
                 <div className="mt-3 font-mono text-sm font-semibold text-white tracking-wide">
@@ -168,7 +168,7 @@ export function FeatureGrid() {
                   <div>
                     <div className="flex items-center justify-between mb-5">
                       {/* Gradient Icon Container */}
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-indigo-800 text-white shadow-accent group-hover:scale-105 transition-transform">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-charcoal-950 shadow-accent group-hover:scale-105 transition-transform">
                         <Icon className="w-5 h-5" />
                       </div>
                       <span className="font-mono text-[11px] text-zinc-400 font-medium bg-zinc-100/80 px-2.5 py-0.5 rounded-md">

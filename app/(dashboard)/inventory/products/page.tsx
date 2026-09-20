@@ -169,9 +169,9 @@ export default function ProductsPage() {
             variant="outline"
             size="sm"
             onClick={() => setIsInvoiceModalOpen(true)}
-            className="text-xs font-semibold gap-1.5 border-indigo-300 text-indigo-800 bg-indigo-50/60 hover:bg-indigo-100/70 shadow-2xs"
+            className="text-xs font-semibold gap-1.5 border-amber-300 text-amber-900 bg-amber-50 hover:bg-amber-100 shadow-2xs"
           >
-            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+            <FileText className="w-3.5 h-3.5 text-amber-600" />
             Upload Billing PDF
           </Button>
           <Button
@@ -193,13 +193,13 @@ export default function ProductsPage() {
         <div
           className={`p-3 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${
             feedback.type === "success"
-              ? "bg-indigo-50 text-indigo-800 border border-indigo-200"
+              ? "bg-amber-50 text-amber-900 border border-amber-200"
               : "bg-red-50 text-red-800 border border-red-200"
           }`}
         >
           <div className="flex items-center gap-2">
             {feedback.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+              <CheckCircle2 className="w-4 h-4 text-amber-600" />
             ) : (
               <AlertCircle className="w-4 h-4 text-red-600" />
             )}

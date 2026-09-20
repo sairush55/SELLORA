@@ -201,8 +201,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             <span className="font-bold text-charcoal-950 text-xs sm:text-sm tracking-tight truncate max-w-[180px] lg:max-w-[260px]">
               {shop?.name || "Ravi Stores"}
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200/80 shrink-0 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200/80 shrink-0 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               Online
             </span>
           </div>
@@ -218,7 +218,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
               }
             }}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-indigo-800 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 transition-all cursor-pointer shadow-2xs"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 transition-all cursor-pointer shadow-2xs"
             title="Install Sellora as App"
           >
             <span className="text-xs">📲</span>
@@ -229,7 +229,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           <Link href="/sales/pos" className="hidden sm:inline-flex">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:brightness-110 shadow-2xs hover:shadow-accent active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 shadow-2xs hover:shadow-accent active:scale-[0.98] transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Sale</span>
@@ -245,7 +245,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               aria-label="Notifications"
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-500 ring-2 ring-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white" />
             </button>
 
             {showNotifications && (
@@ -254,7 +254,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                   <span className="text-xs font-bold text-zinc-900 font-mono uppercase tracking-wider">
                     Notifications
                   </span>
-                  <span className="text-[11px] text-indigo-600 font-semibold cursor-pointer hover:underline">
+                  <span className="text-[11px] text-amber-700 font-semibold cursor-pointer hover:underline">
                     Mark all read
                   </span>
                 </div>
@@ -287,7 +287,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 <div className="p-2 border-t border-zinc-100 text-center bg-zinc-50/50">
                   <Link
                     href="/inventory/stock-alerts"
-                    className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold inline-block py-1"
+                    className="text-xs text-amber-800 hover:text-amber-900 font-semibold inline-block py-1"
                     onClick={() => setShowNotifications(false)}
                   >
                     View all stock alerts →
@@ -319,11 +319,11 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-zinc-200 bg-white shadow-dropdown z-50 p-1.5 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-zinc-200 bg-white shadow-dropdown z-50 p-1.5 animate-in fade-in slide-from-top-2">
                 <div className="p-2.5 border-b border-zinc-100">
                   <p className="text-xs font-bold text-zinc-900 truncate">{merchantName}</p>
                   <p className="text-[10px] text-zinc-500 font-mono truncate">{merchantEmail}</p>
-                  <p className="text-[10px] text-indigo-600 font-semibold mt-1 font-mono">
+                  <p className="text-[10px] text-amber-700 font-semibold mt-1 font-mono">
                     {shop?.name || "Ravi Stores"}
                   </p>
                 </div>
@@ -337,7 +337,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                         window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
                       }
                     }}
-                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-semibold"
+                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-amber-900 hover:bg-amber-50 rounded-lg transition-colors font-semibold"
                   >
                     <span>📲</span>
                     <span>Install as App</span>
@@ -363,18 +363,18 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                     className="flex items-center gap-2 px-2.5 py-2 text-xs text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 rounded-lg transition-colors"
                   >
                     <Settings className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>Store Settings</span>
+                    <span>Shop Settings</span>
                   </Link>
-                </div>
 
-                <div className="pt-1 border-t border-zinc-100">
+                  <div className="my-1 border-t border-zinc-100" />
+
                   <button
                     type="button"
                     onClick={() => {
                       setShowUserMenu(false);
                       logout();
                     }}
-                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"
+                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>
@@ -386,8 +386,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         </div>
       </div>
 
-      {/* 2. Lower Bar: Top Navigation Tabs (Desktop & Tablet only, Mobile uses Fixed Bottom Navigation) */}
-      <div className="hidden md:flex h-11 px-4 sm:px-6 lg:px-8 items-center gap-1.5 overflow-x-auto scrollbar-none bg-white touch-pan-x overscroll-x-contain">
+      {/* Row 2: Secondary Navigation Bar (Fixed 44px, Desktop/Tablet Only) */}
+      <div className="hidden sm:flex items-center gap-1 px-4 lg:px-6 h-11 border-t border-zinc-100 overflow-x-auto no-scrollbar">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -405,13 +405,13 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                   : "text-zinc-600 hover:text-charcoal-950 hover:bg-zinc-100 font-medium"
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-indigo-400" : "text-zinc-400"}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-zinc-400"}`} />
               <span>{item.label}</span>
               {item.badge && (
                 <span
                   className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
                     isActive
-                      ? "bg-indigo-500 text-white"
+                      ? "bg-amber-400 text-charcoal-950"
                       : "bg-zinc-100 text-zinc-600"
                   }`}
                 >

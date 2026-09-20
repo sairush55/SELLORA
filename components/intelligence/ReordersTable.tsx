@@ -328,7 +328,7 @@ export function ReordersTable({
                               {formatINR(item.estimatedCost)}
                             </div>
                             {item.moqApplied && (
-                              <span className="text-[9px] text-indigo-700 block font-semibold">
+                              <span className="text-[9px] text-amber-700 block font-semibold">
                                 MOQ applied
                               </span>
                             )}

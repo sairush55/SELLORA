@@ -236,7 +236,7 @@ export function ExecutivePreview() {
               <Link href="/signup" className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold text-charcoal-950 bg-white hover:bg-zinc-100 hover:shadow-lg transition-all cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-extrabold text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <span>Register Your Shop</span>
                   <ArrowRight className="w-4 h-4" />

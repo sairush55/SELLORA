@@ -56,7 +56,7 @@ export function LandingNavbar() {
           <Link href="/signup">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 hover:brightness-110 shadow-accent hover:shadow-accent-lg active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 shadow-accent hover:shadow-accent-lg active:scale-[0.98] transition-all cursor-pointer"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />

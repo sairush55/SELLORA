@@ -508,7 +508,7 @@ export function ProductModal({
                 disabled={isExtracting || !formData.sourceUrl?.trim()}
                 className="shrink-0 text-xs font-semibold"
               >
-                <ImageIcon className="w-3.5 h-3.5 mr-1 text-indigo-600" />
+                <ImageIcon className="w-3.5 h-3.5 mr-1 text-amber-600" />
                 Extract Image
               </Button>
             </div>
@@ -518,12 +518,12 @@ export function ProductModal({
               <div
                 className={`text-xs p-2 rounded-lg flex items-center gap-1.5 ${
                   extractStatus.type === "success"
-                    ? "bg-indigo-50 text-indigo-800 border border-indigo-200"
+                    ? "bg-amber-50 text-amber-900 border border-amber-200"
                     : "bg-amber-50 text-amber-800 border border-amber-200"
                 }`}
               >
                 {extractStatus.type === "success" ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 ) : (
                   <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 )}

@@ -66,14 +66,14 @@ function LoginForm() {
         <button
           type="button"
           onClick={() => loginDemo("shop-ravi-stores")}
-          className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 bg-zinc-50/80 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all text-left group cursor-pointer shadow-2xs"
+          className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 bg-zinc-50/80 hover:bg-amber-50/60 hover:border-amber-300 transition-all text-left group cursor-pointer shadow-2xs"
         >
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-zinc-900 group-hover:text-indigo-700">
+              <span className="text-sm font-bold text-zinc-900 group-hover:text-amber-800">
                 Ravi Stores
               </span>
-              <span className="text-[9px] font-semibold text-indigo-800 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">
+              <span className="text-[9px] font-semibold text-amber-900 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
                 Demo
               </span>
             </div>
@@ -81,7 +81,7 @@ function LoginForm() {
               Ravi Kumar • Password: <code className="font-mono text-zinc-700 font-semibold bg-zinc-200/70 px-1 py-0.2 rounded">sellora123</code>
             </p>
           </div>
-          <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-indigo-600 shrink-0 ml-2 group-hover:translate-x-0.5 transition-all" />
+          <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-600 shrink-0 ml-2 group-hover:translate-x-0.5 transition-all" />
         </button>
       </div>
 

@@ -211,7 +211,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                   <span className="text-sm">📲</span>
                   <span>Install as App</span>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-brand-600 text-white">
+                <span className="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-brand-500 text-charcoal-950">
                   PWA
                 </span>
               </button>

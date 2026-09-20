@@ -82,7 +82,7 @@ export function WorkflowVisual() {
                   <div
                     className={`h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
                       item.highlight
-                        ? "bg-gradient-to-br from-brand-600 to-indigo-800 text-white shadow-xs"
+                        ? "bg-gradient-to-br from-amber-400 to-yellow-500 text-charcoal-950 shadow-xs"
                         : "bg-zinc-50 border border-zinc-200/60 text-zinc-700 group-hover:bg-brand-50 group-hover:text-brand-700 group-hover:border-brand-200"
                     }`}
                   >

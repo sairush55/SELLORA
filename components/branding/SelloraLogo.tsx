@@ -61,7 +61,7 @@ export function SelloraLogo({
             width="12"
             height="12"
             rx="2.5"
-            className="fill-brand-600"
+            className="fill-brand-500"
           />
           <rect
             x="6"

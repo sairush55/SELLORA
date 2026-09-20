@@ -497,7 +497,7 @@ export default function POSBillingPage() {
                             }}
                             className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
                               cartItem
-                                ? "bg-brand-600 text-white shadow-2xs"
+                                ? "bg-brand-500 text-charcoal-950 font-bold shadow-2xs"
                                 : "bg-zinc-100 text-zinc-800 hover:bg-brand-50 hover:text-brand-700"
                             }`}
                           >
@@ -861,7 +861,7 @@ export default function POSBillingPage() {
                 type="button"
                 onClick={handleCompleteSale}
                 disabled={cart.length === 0 || isProcessing}
-                className="w-full h-12 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 hover:brightness-110 shadow-accent hover:shadow-accent-lg active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+                className="w-full h-12 rounded-xl font-extrabold text-sm text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 shadow-accent hover:shadow-accent-lg active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
               >
                 {isProcessing ? (
                   <span>Processing Sale...</span>
@@ -879,9 +879,9 @@ export default function POSBillingPage() {
 
       {/* Mobile Floating Cart Summary Bar (lg:hidden) */}
       {cart.length > 0 && mobileTab === "catalog" && (
-        <div className="lg:hidden fixed bottom-14 left-3 right-3 z-30 bg-charcoal-950/95 backdrop-blur-md text-white p-3 rounded-2xl border border-brand-500/40 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-4">
+        <div className="lg:hidden fixed bottom-14 left-3 right-3 z-30 bg-charcoal-950/95 backdrop-blur-md text-white p-3 rounded-2xl border border-amber-500/40 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-mono font-bold text-xs shrink-0">
               {cart.reduce((s, i) => s + i.quantity, 0)}
             </div>
             <div className="min-w-0">
@@ -894,7 +894,7 @@ export default function POSBillingPage() {
           <button
             type="button"
             onClick={() => setMobileTab("cart")}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 hover:brightness-105 active:scale-95 shadow-md flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+            className="px-3.5 py-2 rounded-xl text-xs font-extrabold text-charcoal-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-105 active:scale-95 shadow-md flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
           >
             <span>Review Bill & Pay</span>
             <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />

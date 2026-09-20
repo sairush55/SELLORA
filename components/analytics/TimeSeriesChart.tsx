@@ -50,9 +50,9 @@ export function TimeSeriesChart({
   const getMetricColor = (metric: ChartMetric) => {
     switch (metric) {
       case "revenue":
-        return "bg-charcoal-900 hover:bg-emerald-600";
+        return "bg-charcoal-900 hover:bg-amber-500";
       case "units":
-        return "bg-indigo-600 hover:bg-indigo-700";
+        return "bg-amber-500 hover:bg-amber-600";
       case "bills":
         return "bg-blue-600 hover:bg-blue-700";
       case "avgBill":
