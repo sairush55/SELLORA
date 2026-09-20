@@ -210,8 +210,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         </div>
 
         {/* Right: Quick Action, Notifications, User Menu */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Quick Install App Button */}
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Quick Install App Button (shown on tablet/desktop, mobile has floating banner & drawer) */}
           <button
             type="button"
             onClick={() => {
@@ -219,21 +219,21 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
               }
             }}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 transition-all cursor-pointer shadow-2xs"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 transition-all cursor-pointer shadow-2xs"
             title="Install Sellora as App"
           >
             <span className="text-xs">📲</span>
-            <span className="hidden xs:inline font-medium">Install App</span>
+            <span className="font-medium">Install App</span>
           </button>
 
-          {/* Quick "+ New Sale" Button */}
-          <Link href="/sales/pos">
+          {/* Quick "+ New Sale" Button (shown on tablet/desktop, mobile has bottom nav POS Bill) */}
+          <Link href="/sales/pos" className="hidden sm:inline-flex">
             <button
               type="button"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:brightness-110 shadow-2xs hover:shadow-accent active:scale-[0.98] transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span className="hidden xs:inline">New Sale</span>
+              <span>New Sale</span>
             </button>
           </Link>
 
@@ -387,8 +387,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         </div>
       </div>
 
-      {/* 2. Lower Bar: Top Navigation Tabs (Menu is now at the TOP) */}
-      <div className="h-11 px-4 sm:px-6 lg:px-8 flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-white touch-pan-x overscroll-x-contain">
+      {/* 2. Lower Bar: Top Navigation Tabs (Desktop & Tablet only, Mobile uses Fixed Bottom Navigation) */}
+      <div className="hidden md:flex h-11 px-4 sm:px-6 lg:px-8 items-center gap-1.5 overflow-x-auto scrollbar-none bg-white touch-pan-x overscroll-x-contain">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
