@@ -76,14 +76,14 @@ export function WorkflowVisual() {
               {/* Step Header */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-[11px] font-bold text-zinc-400 group-hover:text-emerald-600 transition-colors">
+                  <span className="font-mono text-[11px] font-bold text-zinc-400 group-hover:text-brand-600 transition-colors">
                     {item.step}
                   </span>
                   <div
                     className={`h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
                       item.highlight
-                        ? "bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-xs"
-                        : "bg-zinc-50 border border-zinc-200/60 text-zinc-700 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:border-emerald-200"
+                        ? "bg-gradient-to-br from-brand-600 to-indigo-800 text-white shadow-xs"
+                        : "bg-zinc-50 border border-zinc-200/60 text-zinc-700 group-hover:bg-brand-50 group-hover:text-brand-700 group-hover:border-brand-200"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -108,7 +108,7 @@ export function WorkflowVisual() {
                 <span
                   className={`font-mono font-semibold px-2 py-0.5 rounded-md border ${
                     item.highlight
-                      ? "text-emerald-800 bg-emerald-100/70 border-emerald-300"
+                      ? "text-brand-800 bg-brand-100/70 border-brand-300"
                       : "text-zinc-700 bg-zinc-50 border-zinc-200/70"
                   }`}
                 >

@@ -15,7 +15,7 @@ export function LandingFooter() {
               Turn every sale into an automated stock reconciliation and replenishment decision.
             </p>
             <div className="flex items-center gap-2 pt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
               <span className="font-mono text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
                 Continuous Sync Engine Active
               </span>
@@ -91,7 +91,7 @@ export function LandingFooter() {
         <div className="mt-12 pt-8 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-zinc-400">
           <p>© {new Date().getFullYear()} SELLORA Technologies. Built for retail excellence.</p>
           <p className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
             Designed with Minimalist Modern Precision
           </p>
         </div>

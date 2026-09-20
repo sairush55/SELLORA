@@ -8,7 +8,7 @@ import { SelloraLogo } from "@/components/branding/SelloraLogo";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Store } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function SignupPage() {
           {/* Quick Demo Access */}
           <div className="mb-6 p-3 rounded-xl border border-brand-200 bg-brand-50/50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-600" />
+              <Store className="w-4 h-4 text-brand-600" />
               <span className="text-xs font-semibold text-zinc-800">
                 Want to test immediately?
               </span>

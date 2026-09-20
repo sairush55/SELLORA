@@ -6,7 +6,7 @@ import { WorkflowVisual } from "./WorkflowVisual";
 import { useAuth } from "@/hooks/useAuth";
 import {
   ArrowRight,
-  Sparkles,
+  Store,
   ShieldCheck,
   Zap,
   Boxes,
@@ -33,9 +33,9 @@ export function HeroSection() {
           {/* Left Column: Hero Typography & Actions */}
           <div className="flex flex-col items-start text-left">
             {/* Minimalist Modern Section Label Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/5 backdrop-blur-xs mb-6 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-800 font-semibold">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-brand-500/25 bg-brand-500/5 backdrop-blur-xs mb-6 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-brand-800 font-semibold">
                 Autonomous Retail Intelligence
               </span>
             </div>
@@ -61,7 +61,7 @@ export function HeroSection() {
               <Link href="/signup">
                 <button
                   type="button"
-                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:brightness-110 shadow-accent hover:shadow-accent-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
+                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 hover:brightness-110 shadow-accent hover:shadow-accent-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <span>Start Managing Your Shop</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -71,9 +71,9 @@ export function HeroSection() {
               <button
                 type="button"
                 onClick={() => loginDemo()}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-zinc-800 bg-white border border-zinc-300/90 hover:bg-zinc-50 hover:border-zinc-400 shadow-xs hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-zinc-800 bg-white border border-zinc-300/90 hover:bg-zinc-50 hover:border-brand-400 hover:text-brand-700 shadow-xs hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <Store className="w-4 h-4 text-brand-600" />
                 <span>Experience Demo Store</span>
               </button>
             </div>
@@ -81,10 +81,10 @@ export function HeroSection() {
             {/* Trust Badges */}
             <div className="mt-8 pt-6 border-t border-zinc-200/80 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-zinc-500 font-medium">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Built for Indian Retailers
+                <ShieldCheck className="w-4 h-4 text-brand-600" /> Built for Indian Retailers
               </span>
               <span className="flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-emerald-600" /> Native ₹ INR & GST
+                <Zap className="w-4 h-4 text-brand-600" /> Native ₹ INR & GST
               </span>
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-zinc-400" /> 0 Manual Stock Counts
@@ -98,7 +98,7 @@ export function HeroSection() {
             <div className="absolute w-[360px] sm:w-[410px] h-[360px] sm:h-[410px] rounded-full border border-dashed border-zinc-300/70 animate-spin-slow pointer-events-none" />
 
             {/* Inner Accent Ring */}
-            <div className="absolute w-[280px] sm:w-[320px] h-[280px] sm:h-[320px] rounded-full border border-emerald-500/15 pointer-events-none" />
+            <div className="absolute w-[280px] sm:w-[320px] h-[280px] sm:h-[320px] rounded-full border border-brand-500/15 pointer-events-none" />
 
             {/* Ambient Radial Glow */}
             <div className="absolute w-64 h-64 glow-accent blur-[80px] rounded-full pointer-events-none" />
@@ -108,7 +108,7 @@ export function HeroSection() {
               {/* Terminal Header */}
               <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-charcoal-950 text-emerald-400 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-charcoal-950 text-brand-400 flex items-center justify-center">
                     <Receipt className="w-3.5 h-3.5" />
                   </div>
                   <div>
@@ -118,7 +118,7 @@ export function HeroSection() {
                     <span className="text-[10px] text-zinc-400 font-mono">Counter 01 • 14:32 IST</span>
                   </div>
                 </div>
-                <span className="font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
+                <span className="font-mono text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200/80">
                   PAID UPI
                 </span>
               </div>
@@ -142,12 +142,12 @@ export function HeroSection() {
               {/* Live Sync Confirmation */}
               <div className="rounded-xl bg-zinc-50 border border-zinc-200/80 p-2.5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
                   <span className="font-mono text-[10px] text-zinc-600 font-medium">
                     Inventory Auto-Reconciled
                   </span>
                 </div>
-                <span className="font-mono text-[10px] font-bold text-emerald-700">0.08s</span>
+                <span className="font-mono text-[10px] font-bold text-brand-700">0.08s</span>
               </div>
             </div>
 
@@ -163,15 +163,15 @@ export function HeroSection() {
               </div>
               <p className="text-xs font-bold text-zinc-900 truncate">Aashirvaad Atta 10kg</p>
               <p className="text-[10px] text-zinc-500 mt-0.5">
-                Stock: 4 bags • Suggested: <span className="font-bold text-emerald-700">+25</span>
+                Stock: 4 bags • Suggested: <span className="font-bold text-brand-700">+25</span>
               </p>
             </div>
 
             {/* Floating Live Card 2 (Bottom Left): Capital Recovery */}
             <div className="absolute -bottom-4 left-0 sm:left-2 z-20 w-60 p-3.5 rounded-xl bg-charcoal-950 border border-zinc-800 text-white shadow-xl animate-float-reverse">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-mono text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> STOCK VELOCITY
+                <span className="font-mono text-[10px] text-brand-400 font-semibold flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> STOCK VELOCITY
                 </span>
                 <span className="font-mono text-[9px] text-zinc-400">30d analysis</span>
               </div>
@@ -185,8 +185,8 @@ export function HeroSection() {
         <div id="workflow" className="mt-20 sm:mt-24 pt-12 border-t border-zinc-200/80">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-2">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-800">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-500/20 bg-brand-500/5 mb-2">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-brand-800">
                   Continuous Feedback Engine
                 </span>
               </div>

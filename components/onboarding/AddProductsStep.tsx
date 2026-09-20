@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Badge } from "../ui/Badge";
-import { Check, Plus, Package, ArrowRight, Sparkles } from "lucide-react";
+import { Check, Plus, Package, ArrowRight } from "lucide-react";
 
 interface AddProductsStepProps {
   onNext: () => void;

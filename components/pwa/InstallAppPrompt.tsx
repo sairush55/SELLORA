@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Download, X, Share, PlusSquare, Smartphone, CheckCircle, Sparkles } from "lucide-react";
+import { Download, X, Share, PlusSquare, Smartphone, CheckCircle } from "lucide-react";
 import Image from "next/image";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -118,32 +118,32 @@ export function InstallAppPrompt() {
     <>
       {/* 1. Installed Success Notification Toast */}
       {installedSuccess && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-charcoal-950 text-white px-4 py-2.5 rounded-xl border border-emerald-500/40 shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-in-from-top-4">
-          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-charcoal-950 text-white px-4 py-2.5 rounded-xl border border-indigo-500/40 shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-from-top-4">
+          <CheckCircle className="w-4 h-4 text-indigo-400 shrink-0" />
           <span>SELLORA installed successfully! Open from your Home Screen.</span>
         </div>
       )}
 
       {/* 2. Floating Mobile Install Banner */}
       {shouldShowBanner && (
-        <div className="fixed bottom-14 md:bottom-4 left-3 right-3 z-40 sm:left-auto sm:right-4 sm:w-96 bg-charcoal-950/95 backdrop-blur-md text-white p-3.5 rounded-2xl border border-emerald-500/30 shadow-2xl animate-in fade-in slide-in-from-bottom-5">
+        <div className="fixed bottom-14 md:bottom-4 left-3 right-3 z-40 sm:left-auto sm:right-4 sm:w-96 bg-charcoal-950/95 backdrop-blur-md text-white p-3.5 rounded-2xl border border-indigo-500/30 shadow-2xl animate-in fade-in slide-from-bottom-5">
           <div className="flex items-center justify-between gap-3">
             {/* App Icon + Text */}
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-charcoal-800 to-zinc-900 border border-emerald-500/40 flex items-center justify-center shrink-0 p-1 shadow-inner">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-charcoal-800 to-zinc-900 border border-indigo-500/40 flex items-center justify-center shrink-0 p-1 shadow-inner">
                 {/* SVG Icon thumbnail */}
                 <svg viewBox="0 0 40 40" fill="none" className="w-7 h-7">
                   <rect x="6" y="22" width="12" height="12" rx="2.5" fill="#27272a" />
-                  <rect x="22" y="22" width="12" height="12" rx="2.5" fill="#059669" />
+                  <rect x="22" y="22" width="12" height="12" rx="2.5" fill="#4f46e5" />
                   <rect x="6" y="6" width="12" height="12" rx="2.5" fill="#3f3f46" />
                   <path
                     d="M18 18L32 6M32 6H24M32 6V14"
-                    stroke="#10b981"
+                    stroke="#6366f1"
                     strokeWidth="3.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <circle cx="32" cy="6" r="3.5" fill="#34d399" />
+                  <circle cx="32" cy="6" r="3.5" fill="#818cf8" />
                 </svg>
               </div>
 
@@ -152,7 +152,7 @@ export function InstallAppPrompt() {
                   <span className="font-extrabold text-xs tracking-tight text-zinc-100 truncate">
                     Install SELLORA as App
                   </span>
-                  <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
+                  <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-mono">
                     Free
                   </span>
                 </div>
@@ -167,7 +167,7 @@ export function InstallAppPrompt() {
               <button
                 type="button"
                 onClick={handleInstallClick}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-charcoal-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:brightness-105 active:scale-95 shadow-md transition-all cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:brightness-105 active:scale-95 shadow-md transition-all cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Install</span>
@@ -192,7 +192,7 @@ export function InstallAppPrompt() {
           <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-zinc-200 shadow-2xl space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-charcoal-950 flex items-center justify-center text-emerald-400 p-1.5">
+                <div className="w-9 h-9 rounded-xl bg-charcoal-950 flex items-center justify-center text-indigo-400 p-1.5">
                   <Smartphone className="w-5 h-5" />
                 </div>
                 <div>

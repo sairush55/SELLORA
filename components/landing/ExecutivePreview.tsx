@@ -7,7 +7,8 @@ import {
   TrendingUp,
   Receipt,
   Boxes,
-  Sparkles,
+  Store,
+  Lightbulb,
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
@@ -22,9 +23,9 @@ export function ExecutivePreview() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-800 font-semibold">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-3">
+            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+            <span className="font-mono text-xs uppercase tracking-[0.15em] text-brand-800 font-semibold">
               Live Terminal Interface
             </span>
           </div>
@@ -49,8 +50,8 @@ export function ExecutivePreview() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-mono text-[10px] text-emerald-800 font-bold tracking-wider uppercase">
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+              <span className="font-mono text-[10px] text-brand-800 font-bold tracking-wider uppercase">
                 Continuous Sync Engine
               </span>
             </div>
@@ -67,7 +68,7 @@ export function ExecutivePreview() {
                 <p className="text-xl font-bold font-mono text-charcoal-950 mt-1">
                   {formatINR(48920)}
                 </p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-2">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md mt-2">
                   <TrendingUp className="w-3 h-3" /> +14.2% vs yesterday
                 </span>
               </div>
@@ -138,7 +139,7 @@ export function ExecutivePreview() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+                      <span className="font-mono font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-200/60">
                         Reorder: +25 bags
                       </span>
                     </div>
@@ -152,7 +153,7 @@ export function ExecutivePreview() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+                      <span className="font-mono font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-200/60">
                         Reorder: +50 pkts
                       </span>
                     </div>
@@ -163,8 +164,8 @@ export function ExecutivePreview() {
               {/* Business Insight Callout */}
               <div className="p-5 rounded-2xl bg-charcoal-950 text-white flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="flex items-center gap-2 font-mono text-[11px] text-emerald-400 font-semibold mb-2">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 font-mono text-[11px] text-brand-400 font-semibold mb-2">
+                    <Lightbulb className="w-3.5 h-3.5" />
                     AUTONOMOUS INSIGHT
                   </div>
                   <h4 className="text-sm font-bold text-white mb-2">
@@ -181,7 +182,7 @@ export function ExecutivePreview() {
                   <button
                     type="button"
                     onClick={() => loginDemo()}
-                    className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1 cursor-pointer"
                   >
                     Open in Demo <ArrowRight className="w-3.5 h-3.5" />
                   </button>
@@ -193,7 +194,7 @@ export function ExecutivePreview() {
           {/* Interactive Footer Bar */}
           <div className="p-4 px-6 bg-white border-t border-zinc-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs text-zinc-600 font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 text-brand-600" />
               <span>Full terminal is interactive with demo store data right now.</span>
             </div>
             <div className="flex items-center gap-3">
@@ -216,9 +217,9 @@ export function ExecutivePreview() {
           <div className="absolute top-0 right-0 w-80 h-80 glow-accent blur-[120px] opacity-40 pointer-events-none" />
 
           <div className="relative z-10 max-w-2xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-emerald-400/25 bg-emerald-500/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-300 font-semibold">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-brand-400/25 bg-brand-500/10">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-brand-300 font-semibold">
                 Start Today
               </span>
             </div>
@@ -247,7 +248,7 @@ export function ExecutivePreview() {
                 onClick={() => loginDemo()}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold text-white border border-white/20 hover:bg-white/10 transition-all cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Store className="w-4 h-4 text-brand-400" />
                 <span>Try Demo Store</span>
               </button>
             </div>

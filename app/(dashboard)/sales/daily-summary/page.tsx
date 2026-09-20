@@ -25,7 +25,6 @@ import {
   Boxes,
   Plus,
   Minus,
-  Sparkles,
   History,
 } from "lucide-react";
 import Link from "next/link";

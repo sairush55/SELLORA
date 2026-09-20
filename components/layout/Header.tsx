@@ -27,7 +27,6 @@ import {
   Menu,
   User,
   CheckCircle2,
-  Sparkles,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -202,9 +201,9 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             <span className="font-bold text-charcoal-950 text-xs sm:text-sm tracking-tight truncate max-w-[180px] lg:max-w-[260px]">
               {shop?.name || "Ravi Stores"}
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shrink-0 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Terminal
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200/80 shrink-0 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              Online
             </span>
           </div>
         </div>
@@ -219,7 +218,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
               }
             }}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 transition-all cursor-pointer shadow-2xs"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-indigo-800 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 transition-all cursor-pointer shadow-2xs"
             title="Install Sellora as App"
           >
             <span className="text-xs">📲</span>
@@ -230,7 +229,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           <Link href="/sales/pos" className="hidden sm:inline-flex">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:brightness-110 shadow-2xs hover:shadow-accent active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:brightness-110 shadow-2xs hover:shadow-accent active:scale-[0.98] transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Sale</span>
@@ -246,7 +245,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               aria-label="Notifications"
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-500 ring-2 ring-white" />
             </button>
 
             {showNotifications && (
@@ -255,7 +254,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                   <span className="text-xs font-bold text-zinc-900 font-mono uppercase tracking-wider">
                     Notifications
                   </span>
-                  <span className="text-[11px] text-emerald-700 font-semibold cursor-pointer hover:underline">
+                  <span className="text-[11px] text-indigo-600 font-semibold cursor-pointer hover:underline">
                     Mark all read
                   </span>
                 </div>
@@ -324,7 +323,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 <div className="p-2.5 border-b border-zinc-100">
                   <p className="text-xs font-bold text-zinc-900 truncate">{merchantName}</p>
                   <p className="text-[10px] text-zinc-500 font-mono truncate">{merchantEmail}</p>
-                  <p className="text-[10px] text-emerald-700 font-semibold mt-1 font-mono">
+                  <p className="text-[10px] text-indigo-600 font-semibold mt-1 font-mono">
                     {shop?.name || "Ravi Stores"}
                   </p>
                 </div>
@@ -338,7 +337,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                         window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
                       }
                     }}
-                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-emerald-800 hover:bg-emerald-50 rounded-lg transition-colors font-semibold"
+                    className="flex items-center gap-2 w-full px-2.5 py-2 text-xs text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-semibold"
                   >
                     <span>📲</span>
                     <span>Install as App</span>
@@ -406,13 +405,13 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                   : "text-zinc-600 hover:text-charcoal-950 hover:bg-zinc-100 font-medium"
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400" : "text-zinc-400"}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-indigo-400" : "text-zinc-400"}`} />
               <span>{item.label}</span>
               {item.badge && (
                 <span
                   className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
                     isActive
-                      ? "bg-emerald-500 text-charcoal-950"
+                      ? "bg-indigo-500 text-white"
                       : "bg-zinc-100 text-zinc-600"
                   }`}
                 >

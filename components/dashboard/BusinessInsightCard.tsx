@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/Card";
 import { useShop } from "@/hooks/useShop";
 import { analyticsService } from "@/services/analyticsService";
-import { Sparkles, AlertTriangle, ArrowUpRight, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Lightbulb, AlertTriangle, ArrowUpRight, TrendingUp, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export function BusinessInsightCard() {
@@ -44,9 +44,9 @@ export function BusinessInsightCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-md bg-brand-100 flex items-center justify-center text-brand-700">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Lightbulb className="w-3.5 h-3.5" />
             </div>
-            <CardTitle>Autonomous Business Insights</CardTitle>
+            <CardTitle>Business Insights</CardTitle>
           </div>
           <span className="text-[10px] font-mono text-brand-700 font-bold bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
             {insights.length} Active Signals

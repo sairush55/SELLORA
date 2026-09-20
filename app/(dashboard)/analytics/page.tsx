@@ -32,7 +32,6 @@ import {
   BarChart3,
   FileSpreadsheet,
   Printer,
-  Sparkles,
   Package,
   Clock,
 } from "lucide-react";
@@ -127,8 +126,8 @@ export default function AnalyticsPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
               Retail Intelligence & Analytics
             </h1>
-            <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-              <Sparkles className="w-3 h-3 text-emerald-600" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
               Live Data
             </span>
           </div>

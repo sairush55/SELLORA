@@ -4,12 +4,11 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { authService } from "@/services/authService";
 import { SelloraLogo } from "@/components/branding/SelloraLogo";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { Mail, Lock, ArrowRight, Sparkles, ShieldCheck, Database } from "lucide-react";
+import { Mail, Lock, ArrowRight, Store } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -17,7 +16,6 @@ function LoginForm() {
   const redirectPath = searchParams.get("redirect") || "/dashboard";
 
   const { login, loginDemo } = useAuth();
-  const isSupabase = authService.isSupabaseConnected();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -52,53 +50,38 @@ function LoginForm() {
           Welcome back
         </h1>
         <p className="text-xs text-zinc-500 mt-1 max-w-xs mx-auto leading-relaxed">
-          Sign in to your SELLORA retail intelligence terminal
+          Sign in to your SELLORA retail terminal
         </p>
-
-        {/* Auth Mode Indicator */}
-        <div className="mt-3">
-          {isSupabase ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              Supabase Cloud Auth Active
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200">
-              <Database className="w-3 h-3 text-zinc-500" />
-              Local Standalone Mode (Supabase keys not detected in .env.local)
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Dedicated Demo Account Access */}
       <div className="mb-6 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-zinc-700 tracking-tight flex items-center gap-1.5 font-mono uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-            Dedicated Demo Account
+            <Store className="w-3.5 h-3.5 text-brand-600" />
+            Quick Demo Account
           </span>
           <span className="text-[10px] font-mono text-zinc-400">1-Click</span>
         </div>
         <button
           type="button"
           onClick={() => loginDemo("shop-ravi-stores")}
-          className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 bg-zinc-50/80 hover:bg-emerald-50/50 hover:border-emerald-300 transition-all text-left group cursor-pointer shadow-2xs"
+          className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 bg-zinc-50/80 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all text-left group cursor-pointer shadow-2xs"
         >
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-zinc-900 group-hover:text-emerald-700">
+              <span className="text-sm font-bold text-zinc-900 group-hover:text-indigo-700">
                 Ravi Stores
               </span>
-              <span className="text-[9px] font-semibold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.2 rounded border border-emerald-200">
-                Live Demo
+              <span className="text-[9px] font-semibold text-indigo-800 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">
+                Demo
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 truncate mt-0.5">
               Ravi Kumar • Password: <code className="font-mono text-zinc-700 font-semibold bg-zinc-200/70 px-1 py-0.2 rounded">sellora123</code>
             </p>
           </div>
-          <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-600 shrink-0 ml-2 group-hover:translate-x-0.5 transition-all" />
+          <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-indigo-600 shrink-0 ml-2 group-hover:translate-x-0.5 transition-all" />
         </button>
       </div>
 

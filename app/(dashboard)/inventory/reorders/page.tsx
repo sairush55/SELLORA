@@ -15,7 +15,6 @@ import {
   AlertTriangle,
   FileSpreadsheet,
   Truck,
-  Sparkles,
   Wallet,
   Clock,
   CheckCircle2,

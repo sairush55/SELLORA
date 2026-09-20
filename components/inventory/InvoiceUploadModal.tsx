@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  Sparkles,
   Boxes,
   X,
   Trash2,
@@ -242,7 +241,7 @@ export function InvoiceUploadModal({
         {/* Header */}
         <div className="px-5 py-4 bg-zinc-900 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-brand-600/30 text-brand-400 border border-brand-500/30 flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
             <div>
@@ -257,10 +256,11 @@ export function InvoiceUploadModal({
             </div>
           </div>
           <button
-            onClick={handleClose}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -280,9 +280,9 @@ export function InvoiceUploadModal({
           </div>
         )}
 
-        {/* Tab Switcher: Upload PDF vs Paste Text */}
+        {/* Tab Selector (Upload step only) */}
         {step === "upload" && (
-          <div className="flex border-b border-zinc-200 bg-zinc-50 px-6 pt-3 gap-2">
+          <div className="flex items-center px-6 pt-3 border-b border-zinc-200 bg-zinc-50/50 gap-2">
             <button
               type="button"
               onClick={() => {
@@ -291,11 +291,11 @@ export function InvoiceUploadModal({
               }}
               className={`pb-2.5 px-3.5 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
                 tabMode === "pdf"
-                  ? "border-emerald-600 text-emerald-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
+                  ? "border-brand-600 text-brand-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
                   : "border-transparent text-zinc-500 hover:text-zinc-800"
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <FileText className="w-3.5 h-3.5 text-brand-600" />
               <span>Upload PDF File</span>
             </button>
 
@@ -307,7 +307,7 @@ export function InvoiceUploadModal({
               }}
               className={`pb-2.5 px-3.5 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
                 tabMode === "text"
-                  ? "border-emerald-600 text-emerald-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
+                  ? "border-brand-600 text-brand-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
                   : "border-transparent text-zinc-500 hover:text-zinc-800"
               }`}
             >
@@ -330,11 +330,11 @@ export function InvoiceUploadModal({
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-all ${
                   dragOver
-                    ? "border-emerald-500 bg-emerald-50/50"
+                    ? "border-brand-500 bg-brand-50/50"
                     : "border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 hover:border-zinc-300"
                 }`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 border border-brand-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs">
                   <UploadCloud className="w-6 h-6" />
                 </div>
 
@@ -386,7 +386,7 @@ export function InvoiceUploadModal({
                         setTabMode("text");
                         setErrorMessage(null);
                       }}
-                      className="mt-2 inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
+                      className="mt-2 inline-flex items-center gap-1 font-bold text-brand-700 hover:text-brand-900 underline cursor-pointer"
                     >
                       <span>Open in Paste Text Editor →</span>
                     </button>
@@ -407,7 +407,7 @@ export function InvoiceUploadModal({
                         `1  Tata Salt 1kg  2501  50  PKT  22.00  1100.00\n2  Fortune Sunlite Refined Oil 1L  1512  30  LTR  135.50  4065.00\n3  Aashirvaad Atta 10kg  1101  15  BAG  420.00  6300.00\n4  Maggi Noodles 70g  1902  120  PCS  12.00  1440.00\n5  Dettol Soap 75g  3401  60  PCS  38.00  2280.00`
                       )
                     }
-                    className="text-emerald-700 hover:underline font-semibold"
+                    className="text-brand-700 hover:underline font-semibold"
                   >
                     Insert sample text
                   </button>
@@ -418,7 +418,7 @@ export function InvoiceUploadModal({
                   value={pastedText}
                   onChange={(e) => setPastedText(e.target.value)}
                   placeholder="Paste table rows from your PDF, WhatsApp bill, or invoice spreadsheet...&#10;Example:&#10;1  Tata Salt 1kg  50 PKT  22.00  1100.00&#10;2  Fortune Oil 1L  30 LTR  135.50  4065.00"
-                  className="w-full p-3 font-mono text-xs rounded-xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed"
+                  className="w-full p-3 font-mono text-xs rounded-xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all leading-relaxed"
                 />
 
                 <div className="flex items-center justify-between">
@@ -437,7 +437,7 @@ export function InvoiceUploadModal({
                     onClick={processPastedText}
                     className="text-xs font-semibold gap-1.5 shadow-2xs"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <FileCheck className="w-3.5 h-3.5" />
                     {isProcessing ? "Extracting Items..." : "Extract Line Items"}
                   </Button>
                 </div>
@@ -447,7 +447,7 @@ export function InvoiceUploadModal({
             {/* Quick Demo Invoice Button */}
             <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-xs">
                   ⚡
                 </div>
                 <div>
@@ -535,7 +535,7 @@ export function InvoiceUploadModal({
                         type="checkbox"
                         checked={items.length > 0 && items.every((i) => i.selected)}
                         onChange={(e) => toggleSelectAll(e.target.checked)}
-                        className="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                        className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
                       />
                     </th>
                     <th className="py-2.5 px-3">Product Name & SKU</th>
@@ -571,7 +571,7 @@ export function InvoiceUploadModal({
                             type="checkbox"
                             checked={item.selected}
                             onChange={(e) => updateItem(item.id, { selected: e.target.checked })}
-                            className="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                            className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
                           />
                         </td>
 

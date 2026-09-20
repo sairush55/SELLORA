@@ -11,7 +11,6 @@ import {
   FileText,
   Calendar,
   Layers,
-  Sparkles,
 } from "lucide-react";
 
 interface ReportModalProps {
@@ -54,7 +53,7 @@ export function ReportModal({ report, isOpen, onClose }: ReportModalProps) {
               onClick={() => reportExportService.exportToCSV(report)}
               className="text-xs font-semibold gap-1.5"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-brand-600" />
               Download CSV
             </Button>
             <Button

@@ -205,13 +205,13 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                     window.dispatchEvent(new CustomEvent("sellora:trigger-install"));
                   }
                 }}
-                className="w-full flex items-center justify-between py-2 px-3 text-xs font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-xl transition-all cursor-pointer shadow-2xs"
+                className="w-full flex items-center justify-between py-2 px-3 text-xs font-semibold text-brand-900 bg-brand-50 hover:bg-brand-100/80 border border-brand-200/80 rounded-xl transition-all cursor-pointer shadow-2xs"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm">📲</span>
                   <span>Install as App</span>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white">
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-brand-600 text-white">
                   PWA
                 </span>
               </button>

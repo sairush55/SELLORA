@@ -16,7 +16,6 @@ import {
   Image as ImageIcon,
   Tag,
   Link as LinkIcon,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
@@ -496,7 +495,7 @@ export function ProductModal({
                   placeholder="https://example.com/product/..."
                   value={formData.sourceUrl || ""}
                   onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
-                  className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
@@ -509,7 +508,7 @@ export function ProductModal({
                 disabled={isExtracting || !formData.sourceUrl?.trim()}
                 className="shrink-0 text-xs font-semibold"
               >
-                <Sparkles className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                <ImageIcon className="w-3.5 h-3.5 mr-1 text-indigo-600" />
                 Extract Image
               </Button>
             </div>
@@ -519,12 +518,12 @@ export function ProductModal({
               <div
                 className={`text-xs p-2 rounded-lg flex items-center gap-1.5 ${
                   extractStatus.type === "success"
-                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                    ? "bg-indigo-50 text-indigo-800 border border-indigo-200"
                     : "bg-amber-50 text-amber-800 border border-amber-200"
                 }`}
               >
                 {extractStatus.type === "success" ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                 ) : (
                   <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 )}

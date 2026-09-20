@@ -16,13 +16,13 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 160 84% 39%;
+    --accent: 243 75% 59%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 160 84% 39%;
+    --ring: 243 75% 59%;
     --radius: 0.5rem;
   }
 
@@ -59,14 +59,14 @@
 
 /* Minimalist Modern Design System Utilities */
 .gradient-text {
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #14b8a6 100%);
+  background: linear-gradient(135deg, #3730a3 0%, #4f46e5 50%, #2563eb 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .gradient-text-electric {
-  background: linear-gradient(to right, #10b981, #34d399);
+  background: linear-gradient(to right, #4f46e5, #38bdf8);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -79,7 +79,7 @@
   height: 0.6rem;
   width: 100%;
   border-radius: 0.125rem;
-  background: linear-gradient(to right, rgba(16, 185, 129, 0.22), rgba(20, 184, 166, 0.08));
+  background: linear-gradient(to right, rgba(79, 70, 229, 0.25), rgba(59, 130, 246, 0.1));
   z-index: -1;
 }
 
@@ -94,10 +94,10 @@
 }
 
 .glow-accent {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0) 70%);
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(79, 70, 229, 0) 70%);
 }
 
 .card-gradient-border {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(20, 184, 166, 0.1), rgba(16, 185, 129, 0.3));
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.4), rgba(59, 130, 246, 0.15), rgba(79, 70, 229, 0.3));
   padding: 1px;
 }

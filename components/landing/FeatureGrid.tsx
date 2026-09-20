@@ -103,9 +103,9 @@ export function FeatureGrid() {
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-emerald-400/25 bg-emerald-500/10 mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-300 font-semibold">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-brand-400/25 bg-brand-500/10 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-brand-300 font-semibold">
                 By The Numbers
               </span>
             </div>
@@ -118,9 +118,9 @@ export function FeatureGrid() {
             {stats.map((item, idx) => (
               <div
                 key={item.label}
-                className="relative p-6 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-emerald-500/30 hover:bg-white/[0.06] transition-all group"
+                className="relative p-6 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-brand-500/30 hover:bg-white/[0.06] transition-all group"
               >
-                <div className="font-display text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 tracking-tight font-normal">
+                <div className="font-display text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-indigo-300 to-blue-300 tracking-tight font-normal">
                   {item.value}
                 </div>
                 <div className="mt-3 font-mono text-sm font-semibold text-white tracking-wide">
@@ -141,9 +141,9 @@ export function FeatureGrid() {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
             <div>
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-3">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-800 font-semibold">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-3">
+                <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+                <span className="font-mono text-xs uppercase tracking-[0.15em] text-brand-800 font-semibold">
                   Modular Architecture
                 </span>
               </div>
@@ -163,12 +163,12 @@ export function FeatureGrid() {
               return (
                 <div
                   key={f.title}
-                  className="group relative flex flex-col justify-between p-7 rounded-2xl border border-zinc-200/90 bg-white hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                  className="group relative flex flex-col justify-between p-7 rounded-2xl border border-zinc-200/90 bg-white hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-5">
                       {/* Gradient Icon Container */}
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-accent group-hover:scale-105 transition-transform">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-indigo-800 text-white shadow-accent group-hover:scale-105 transition-transform">
                         <Icon className="w-5 h-5" />
                       </div>
                       <span className="font-mono text-[11px] text-zinc-400 font-medium bg-zinc-100/80 px-2.5 py-0.5 rounded-md">
@@ -176,7 +176,7 @@ export function FeatureGrid() {
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-charcoal-950 group-hover:text-emerald-700 transition-colors">
+                    <h3 className="text-lg font-bold text-charcoal-950 group-hover:text-brand-700 transition-colors">
                       {f.title}
                     </h3>
 
@@ -186,7 +186,7 @@ export function FeatureGrid() {
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-zinc-100 flex items-center justify-between text-xs">
-                    <span className="font-mono text-[11px] text-emerald-700 font-semibold">
+                    <span className="font-mono text-[11px] text-brand-700 font-semibold">
                       {f.badge}
                     </span>
                     <span className="font-mono text-[11px] text-zinc-400">

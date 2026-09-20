@@ -5,7 +5,6 @@ import { AIStockAnswer, AISummaryQuery } from "@/types/stockIntelligence";
 import { stockIntelligenceAIService } from "@/services/stockIntelligenceAIService";
 import { Button } from "@/components/ui/Button";
 import {
-  Sparkles,
   Send,
   HelpCircle,
   AlertTriangle,
@@ -59,13 +58,13 @@ export function AIStockAssistant({ shopId }: AIStockAssistantProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30">
-            <Sparkles className="w-4 h-4" />
+            <TrendingUp className="w-4 h-4" />
           </div>
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              SELLORA AI Stock Advisor
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Grounded on Live Database
+              SELLORA Stock Advisor
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                Live Inventory Intelligence
               </span>
             </h2>
             <p className="text-xs text-zinc-400 mt-0.5">
@@ -130,7 +129,7 @@ export function AIStockAssistant({ shopId }: AIStockAssistantProps) {
         <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs leading-relaxed animate-in fade-in duration-200">
           <div className="flex items-center justify-between gap-2 pb-2 mb-3 border-b border-white/10">
             <span className="font-semibold text-brand-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
+              <HelpCircle className="w-3.5 h-3.5" />
               Q: {activeAnswer.query}
             </span>
             <span className="text-[10px] font-mono text-zinc-400">
