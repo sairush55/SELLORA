@@ -133,6 +133,7 @@ export const invoiceParserService = {
       suggestedSellingPrice: number;
       hsn?: string;
     }>;
+    rawTextPreview?: string;
     error?: string;
   }> {
     const formData = new FormData();
@@ -141,6 +142,36 @@ export const invoiceParserService = {
     const res = await fetch("/api/extract-invoice-pdf", {
       method: "POST",
       body: formData,
+    });
+
+    const data = await res.json();
+    return data;
+  },
+
+  // Parse raw invoice text or pasted table directly
+  async parseRawInvoiceText(text: string): Promise<{
+    success: boolean;
+    invoiceNumber?: string;
+    supplierName?: string;
+    date?: string;
+    items: Array<{
+      name: string;
+      sku?: string;
+      quantity: number;
+      unit?: string;
+      costPrice: number;
+      suggestedSellingPrice: number;
+      hsn?: string;
+    }>;
+    rawTextPreview?: string;
+    error?: string;
+  }> {
+    const res = await fetch("/api/extract-invoice-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
     });
 
     const data = await res.json();

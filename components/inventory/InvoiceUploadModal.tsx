@@ -41,6 +41,9 @@ export function InvoiceUploadModal({
   onImportSuccess,
 }: InvoiceUploadModalProps) {
   const [step, setStep] = useState<"upload" | "review">("upload");
+  const [tabMode, setTabMode] = useState<"pdf" | "text">("pdf");
+  const [pastedText, setPastedText] = useState<string>("");
+  const [rawTextPreview, setRawTextPreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -58,6 +61,9 @@ export function InvoiceUploadModal({
 
   const handleReset = () => {
     setStep("upload");
+    setTabMode("pdf");
+    setPastedText("");
+    setRawTextPreview(null);
     setIsProcessing(false);
     setErrorMessage(null);
     setItems([]);
@@ -73,14 +79,24 @@ export function InvoiceUploadModal({
   // Process uploaded file
   const processFile = async (file: File) => {
     setErrorMessage(null);
+    setRawTextPreview(null);
     setIsProcessing(true);
 
     try {
       const res = await invoiceParserService.uploadAndParsePdf(file);
+
+      if (res.rawTextPreview) {
+        setRawTextPreview(res.rawTextPreview);
+      }
+
       if (!res.success || !res.items || res.items.length === 0) {
         setErrorMessage(
-          res.error || "No readable product line items could be detected in this invoice PDF."
+          res.error ||
+            "No product line items could be detected in this invoice PDF. You can switch to the 'Paste Bill Text' tab to inspect or paste your bill directly."
         );
+        if (res.rawTextPreview) {
+          setPastedText(res.rawTextPreview);
+        }
         setIsProcessing(false);
         return;
       }
@@ -95,6 +111,42 @@ export function InvoiceUploadModal({
       setStep("review");
     } catch (err: any) {
       setErrorMessage(err.message || "Failed to process PDF file.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Process pasted text
+  const processPastedText = async () => {
+    if (!pastedText.trim()) {
+      setErrorMessage("Please paste some invoice text or table rows first.");
+      return;
+    }
+
+    setErrorMessage(null);
+    setIsProcessing(true);
+
+    try {
+      const res = await invoiceParserService.parseRawInvoiceText(pastedText);
+
+      if (!res.success || !res.items || res.items.length === 0) {
+        setErrorMessage(
+          res.error ||
+            "Could not detect products in the pasted text. Make sure lines include product names, quantities, and prices."
+        );
+        setIsProcessing(false);
+        return;
+      }
+
+      setInvoiceNumber(res.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`);
+      setSupplierName(res.supplierName || "Supplier Invoice");
+      setInvoiceDate(res.date || new Date().toISOString().split("T")[0]);
+
+      const matched = invoiceParserService.matchInvoiceItems(shopId, res.items);
+      setItems(matched);
+      setStep("review");
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to parse pasted text.");
     } finally {
       setIsProcessing(false);
     }
@@ -228,58 +280,169 @@ export function InvoiceUploadModal({
           </div>
         )}
 
-        {/* Body Step 1: Upload Dropzone */}
+        {/* Tab Switcher: Upload PDF vs Paste Text */}
         {step === "upload" && (
-          <div className="p-6 space-y-5">
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOver(true);
+          <div className="flex border-b border-zinc-200 bg-zinc-50 px-6 pt-3 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setTabMode("pdf");
+                setErrorMessage(null);
               }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-all ${
-                dragOver
-                  ? "border-emerald-500 bg-emerald-50/50"
-                  : "border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 hover:border-zinc-300"
+              className={`pb-2.5 px-3.5 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+                tabMode === "pdf"
+                  ? "border-emerald-600 text-emerald-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
+                  : "border-transparent text-zinc-500 hover:text-zinc-800"
               }`}
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs">
-                <UploadCloud className="w-6 h-6" />
-              </div>
+              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Upload PDF File</span>
+            </button>
 
-              <h3 className="text-sm font-bold text-zinc-900">
-                Drag and drop your Supplier Invoice PDF here
-              </h3>
-              <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
-                Upload distributor delivery slips, wholesale bills, or GST tax invoices (PDF format
-                up to 10MB).
-              </p>
+            <button
+              type="button"
+              onClick={() => {
+                setTabMode("text");
+                setErrorMessage(null);
+              }}
+              className={`pb-2.5 px-3.5 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+                tabMode === "text"
+                  ? "border-emerald-600 text-emerald-900 bg-white rounded-t-lg -mb-[1px] shadow-2xs"
+                  : "border-transparent text-zinc-500 hover:text-zinc-800"
+              }`}
+            >
+              <span className="text-xs">📋</span>
+              <span>Paste Bill Text / Table</span>
+            </button>
+          </div>
+        )}
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) processFile(f);
+        {/* Body Step 1: Upload Dropzone & Paste Section */}
+        {step === "upload" && (
+          <div className="p-6 space-y-5">
+            {tabMode === "pdf" ? (
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
                 }}
-              />
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-all ${
+                  dragOver
+                    ? "border-emerald-500 bg-emerald-50/50"
+                    : "border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 hover:border-zinc-300"
+                }`}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
 
-              <div className="mt-5 flex items-center justify-center gap-3">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  disabled={isProcessing}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-xs font-semibold gap-1.5 shadow-2xs"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  {isProcessing ? "Processing PDF..." : "Browse PDF File"}
-                </Button>
+                <h3 className="text-sm font-bold text-zinc-900">
+                  Drag and drop your Supplier Invoice PDF here
+                </h3>
+                <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
+                  Upload distributor delivery slips, wholesale bills, or GST tax invoices (PDF format
+                  up to 15MB).
+                </p>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) processFile(f);
+                  }}
+                />
+
+                <div className="mt-5 flex items-center justify-center gap-3">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={isProcessing}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs font-semibold gap-1.5 shadow-2xs"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    {isProcessing ? "Extracting Products..." : "Browse PDF File"}
+                  </Button>
+                </div>
+
+                {/* Helpful fallback if PDF had text but failed parsing */}
+                {rawTextPreview && (
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-left text-xs">
+                    <p className="font-semibold text-amber-900">
+                      📄 Text was extracted from your PDF ({rawTextPreview.length} characters)
+                    </p>
+                    <p className="text-[11px] text-amber-700 mt-0.5">
+                      If line items weren&apos;t detected automatically, you can edit or review the text directly.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPastedText(rawTextPreview);
+                        setTabMode("text");
+                        setErrorMessage(null);
+                      }}
+                      className="mt-2 inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
+                    >
+                      <span>Open in Paste Text Editor →</span>
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              /* Paste Text Mode */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <label className="font-semibold text-zinc-700">
+                    Paste invoice table or text lines:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPastedText(
+                        `1  Tata Salt 1kg  2501  50  PKT  22.00  1100.00\n2  Fortune Sunlite Refined Oil 1L  1512  30  LTR  135.50  4065.00\n3  Aashirvaad Atta 10kg  1101  15  BAG  420.00  6300.00\n4  Maggi Noodles 70g  1902  120  PCS  12.00  1440.00\n5  Dettol Soap 75g  3401  60  PCS  38.00  2280.00`
+                      )
+                    }
+                    className="text-emerald-700 hover:underline font-semibold"
+                  >
+                    Insert sample text
+                  </button>
+                </div>
+
+                <textarea
+                  rows={8}
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  placeholder="Paste table rows from your PDF, WhatsApp bill, or invoice spreadsheet...&#10;Example:&#10;1  Tata Salt 1kg  50 PKT  22.00  1100.00&#10;2  Fortune Oil 1L  30 LTR  135.50  4065.00"
+                  className="w-full p-3 font-mono text-xs rounded-xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed"
+                />
+
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setPastedText("")}
+                    className="text-xs text-zinc-400 hover:text-zinc-600"
+                  >
+                    Clear text
+                  </button>
+
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={isProcessing || !pastedText.trim()}
+                    onClick={processPastedText}
+                    className="text-xs font-semibold gap-1.5 shadow-2xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {isProcessing ? "Extracting Items..." : "Extract Line Items"}
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Quick Demo Invoice Button */}
             <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
