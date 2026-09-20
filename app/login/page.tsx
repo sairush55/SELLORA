@@ -4,11 +4,12 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { authService } from "@/services/authService";
 import { SelloraLogo } from "@/components/branding/SelloraLogo";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles, ShieldCheck, Database } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -16,6 +17,7 @@ function LoginForm() {
   const redirectPath = searchParams.get("redirect") || "/dashboard";
 
   const { login, loginDemo } = useAuth();
+  const isSupabase = authService.isSupabaseConnected();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -42,16 +44,31 @@ function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col items-center mb-6 text-center">
-        <Link href="/" className="inline-flex flex-col items-center mb-4 focus:outline-hidden hover:opacity-90 transition-opacity">
+      <div className="flex flex-col items-center mb-5 text-center">
+        <Link href="/" className="inline-flex flex-col items-center mb-3 focus:outline-hidden hover:opacity-90 transition-opacity">
           <SelloraLogo size="md" showTagline={true} />
         </Link>
         <h1 className="text-2xl font-extrabold text-charcoal-950 tracking-tight">
           Welcome back
         </h1>
-        <p className="text-xs text-zinc-500 mt-1.5 max-w-xs mx-auto leading-relaxed">
+        <p className="text-xs text-zinc-500 mt-1 max-w-xs mx-auto leading-relaxed">
           Sign in to your SELLORA retail intelligence terminal
         </p>
+
+        {/* Auth Mode Indicator */}
+        <div className="mt-3">
+          {isSupabase ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              Supabase Cloud Auth Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200">
+              <Database className="w-3 h-3 text-zinc-500" />
+              Local Standalone Mode (Supabase keys not detected in .env.local)
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Dedicated Demo Account Access */}
@@ -78,7 +95,7 @@ function LoginForm() {
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 truncate mt-0.5">
-              Ravi Kumar • Pre-populated inventory, POS sales & analytics
+              Ravi Kumar • Password: <code className="font-mono text-zinc-700 font-semibold bg-zinc-200/70 px-1 py-0.2 rounded">sellora123</code>
             </p>
           </div>
           <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-600 shrink-0 ml-2 group-hover:translate-x-0.5 transition-all" />
