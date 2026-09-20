@@ -136,7 +136,9 @@ export default function POSBillingPage() {
   const [mobileTab, setMobileTab] = useState<"catalog" | "cart">("catalog");
   const [discountType, setDiscountType] = useState<"percent" | "fixed">("percent");
   const [discountValue, setDiscountValue] = useState<number>(0);
-  const [taxPercent, setTaxPercent] = useState<number>(5); // 5% default GST
+  const [applyGst, setApplyGst] = useState<boolean>(false); // GST is optional, default OFF
+  const [taxPercent, setTaxPercent] = useState<number>(5); // 5% default rate when enabled
+  const [taxType, setTaxType] = useState<"cgst_sgst" | "igst">("cgst_sgst");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
   const [customerName, setCustomerName] = useState<string>("");
 
@@ -262,7 +264,10 @@ export default function POSBillingPage() {
       : Number(discountValue) || 0;
   const discount = Math.min(subtotal, Math.max(0, Math.round(rawDiscount)));
   const taxableAmount = Math.max(0, subtotal - discount);
-  const tax = taxPercent > 0 ? Math.round(taxableAmount * (taxPercent / 100)) : 0;
+  const tax =
+    applyGst && taxPercent > 0
+      ? Math.round(taxableAmount * (taxPercent / 100) * 100) / 100
+      : 0;
   const grandTotal = Math.max(0, taxableAmount + tax);
 
   // Execute Sale Transaction
@@ -278,6 +283,9 @@ export default function POSBillingPage() {
       cartItems: cart,
       discount,
       tax,
+      applyGst,
+      taxRate: applyGst ? taxPercent : 0,
+      taxType: applyGst ? taxType : undefined,
       paymentMethod,
       customerName: customerName.trim() ? customerName.trim() : undefined,
     });
@@ -769,21 +777,60 @@ export default function POSBillingPage() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs">
-                  <span>Tax (GST)</span>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={taxPercent}
-                      onChange={(e) => setTaxPercent(parseInt(e.target.value) || 0)}
-                      className="h-7 px-2 text-xs rounded-lg border border-zinc-200 bg-white font-mono focus:outline-none"
-                    >
-                      <option value={0}>0%</option>
-                      <option value={5}>5% GST</option>
-                      <option value={12}>12% GST</option>
-                      <option value={18}>18% GST</option>
-                    </select>
-                    <span className="font-mono text-zinc-800 font-medium">+{formatINR(tax)}</span>
+                {/* Optional GST Section */}
+                <div className="py-2 border-b border-zinc-200/70 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={applyGst}
+                        onChange={(e) => setApplyGst(e.target.checked)}
+                        className="w-4 h-4 rounded border-zinc-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                      />
+                      <span className="font-semibold text-zinc-800 text-xs">Apply GST</span>
+                    </label>
+                    {applyGst ? (
+                      <span className="font-mono text-xs font-bold text-amber-700">+{formatINR(tax)}</span>
+                    ) : (
+                      <span className="font-mono text-[11px] text-zinc-400">Off (₹0)</span>
+                    )}
                   </div>
+
+                  {applyGst && (
+                    <div className="space-y-1.5 pt-1 pl-6">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-mono text-zinc-500 mb-0.5">GST Rate</label>
+                          <select
+                            value={taxPercent}
+                            onChange={(e) => setTaxPercent(parseInt(e.target.value) || 0)}
+                            className="w-full h-7 px-2 text-xs rounded-md border border-zinc-200 bg-white font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
+                          >
+                            <option value={5}>5% GST</option>
+                            <option value={12}>12% GST</option>
+                            <option value={18}>18% GST</option>
+                            <option value={28}>28% GST</option>
+                          </select>
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-mono text-zinc-500 mb-0.5">Tax Type</label>
+                          <select
+                            value={taxType}
+                            onChange={(e) => setTaxType(e.target.value as "cgst_sgst" | "igst")}
+                            className="w-full h-7 px-2 text-xs rounded-md border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+                          >
+                            <option value="cgst_sgst">Intrastate (CGST + SGST)</option>
+                            <option value="igst">Interstate (IGST)</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-mono text-zinc-500">
+                        {taxType === "cgst_sgst"
+                          ? `CGST ${taxPercent / 2}% (${formatINR(tax / 2)}) + SGST ${taxPercent / 2}% (${formatINR(tax / 2)})`
+                          : `IGST ${taxPercent}% (${formatINR(tax)})`}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center pt-2.5 border-t border-zinc-200">

@@ -71,7 +71,16 @@ export function ReceiptModal({
       "--------------------------------------------------",
       `Subtotal:                               ₹${sale.subtotal.toFixed(2)}`,
       sale.discount > 0 ? `Discount:                              -₹${sale.discount.toFixed(2)}` : "",
-      sale.tax > 0 ? `Tax (GST):                             +₹${sale.tax.toFixed(2)}` : "",
+      ...(sale.tax > 0
+        ? sale.taxType === "cgst_sgst"
+          ? [
+              `CGST @ ${((sale.taxRate || 5) / 2).toFixed(1)}%:                      +₹${(sale.tax / 2).toFixed(2)}`,
+              `SGST @ ${((sale.taxRate || 5) / 2).toFixed(1)}%:                      +₹${(sale.tax / 2).toFixed(2)}`,
+            ]
+          : sale.taxType === "igst"
+          ? [`IGST @ ${(sale.taxRate || 5).toFixed(1)}%:                      +₹${sale.tax.toFixed(2)}`]
+          : [`Tax (GST):                             +₹${sale.tax.toFixed(2)}`]
+        : []),
       "--------------------------------------------------",
       `GRAND TOTAL:                            ₹${sale.totalAmount.toFixed(2)}`,
       `Payment Method:                         ${sale.paymentMethod.toUpperCase()}`,
@@ -202,10 +211,30 @@ export function ReceiptModal({
             )}
 
             {sale.tax > 0 && (
-              <div className="flex justify-between text-zinc-500">
-                <span>Tax (GST):</span>
-                <span className="font-mono text-zinc-800">+{formatINR(sale.tax)}</span>
-              </div>
+              <>
+                {sale.taxType === "cgst_sgst" ? (
+                  <>
+                    <div className="flex justify-between text-zinc-500">
+                      <span>CGST @ {((sale.taxRate || 5) / 2).toFixed(1)}%:</span>
+                      <span className="font-mono text-zinc-800">+{formatINR(sale.tax / 2)}</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-500">
+                      <span>SGST @ {((sale.taxRate || 5) / 2).toFixed(1)}%:</span>
+                      <span className="font-mono text-zinc-800">+{formatINR(sale.tax / 2)}</span>
+                    </div>
+                  </>
+                ) : sale.taxType === "igst" ? (
+                  <div className="flex justify-between text-zinc-500">
+                    <span>IGST @ {(sale.taxRate || 5).toFixed(1)}%:</span>
+                    <span className="font-mono text-zinc-800">+{formatINR(sale.tax)}</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-zinc-500">
+                    <span>Tax (GST):</span>
+                    <span className="font-mono text-zinc-800">+{formatINR(sale.tax)}</span>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="flex justify-between text-sm font-extrabold text-charcoal-950 pt-2 border-t border-zinc-200">

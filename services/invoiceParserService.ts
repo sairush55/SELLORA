@@ -16,10 +16,15 @@ export interface MatchedInvoiceItem {
   quantity: number;
   currentStock: number;
   newStock: number;
-  costPrice: number;
+  baseCostPrice?: number;
+  costPrice: number; // PURCHASE COST INCLUDING GST
+  taxAmount?: number;
+  taxRate?: number;
   sellingPrice: number;
   unit: string;
   selected: boolean;
+  requiresReview?: boolean;
+  reviewReason?: string;
 }
 
 export interface InvoiceImportResult {
@@ -45,9 +50,14 @@ export const invoiceParserService = {
       sku?: string;
       quantity: number;
       unit?: string;
+      baseCostPrice?: number;
       costPrice: number;
+      taxAmount?: number;
+      taxRate?: number;
       suggestedSellingPrice: number;
       hsn?: string;
+      requiresReview?: boolean;
+      reviewReason?: string;
     }>
   ): MatchedInvoiceItem[] {
     const existingProducts = productService.getProducts(shopId);
@@ -81,10 +91,15 @@ export const invoiceParserService = {
           quantity: invoicedQty,
           currentStock,
           newStock: currentStock + invoicedQty,
+          baseCostPrice: item.baseCostPrice || matched.costPrice,
           costPrice: item.costPrice > 0 ? item.costPrice : matched.costPrice,
+          taxAmount: item.taxAmount,
+          taxRate: item.taxRate,
           sellingPrice: matched.sellingPrice,
           unit: matched.unit || item.unit || "Units",
           selected: true,
+          requiresReview: item.requiresReview,
+          reviewReason: item.reviewReason,
         };
       }
 
@@ -110,10 +125,15 @@ export const invoiceParserService = {
         quantity: invoicedQty,
         currentStock: 0,
         newStock: invoicedQty,
+        baseCostPrice: item.baseCostPrice || cost,
         costPrice: cost,
+        taxAmount: item.taxAmount,
+        taxRate: item.taxRate,
         sellingPrice: suggestedSelling,
         unit: item.unit || "Units",
         selected: true,
+        requiresReview: item.requiresReview,
+        reviewReason: item.reviewReason,
       };
     });
   },
@@ -124,14 +144,30 @@ export const invoiceParserService = {
     invoiceNumber?: string;
     supplierName?: string;
     date?: string;
+    summary?: {
+      subtotal: number;
+      taxableAmount: number;
+      cgst: number;
+      sgst: number;
+      igst: number;
+      totalTax: number;
+      grandTotal: number;
+      isTaxInclusive: boolean;
+      effectiveTaxRate?: number;
+    };
     items: Array<{
       name: string;
       sku?: string;
       quantity: number;
       unit?: string;
+      baseCostPrice?: number;
       costPrice: number;
+      taxAmount?: number;
+      taxRate?: number;
       suggestedSellingPrice: number;
       hsn?: string;
+      requiresReview?: boolean;
+      reviewReason?: string;
     }>;
     rawTextPreview?: string;
     error?: string;
@@ -154,14 +190,30 @@ export const invoiceParserService = {
     invoiceNumber?: string;
     supplierName?: string;
     date?: string;
+    summary?: {
+      subtotal: number;
+      taxableAmount: number;
+      cgst: number;
+      sgst: number;
+      igst: number;
+      totalTax: number;
+      grandTotal: number;
+      isTaxInclusive: boolean;
+      effectiveTaxRate?: number;
+    };
     items: Array<{
       name: string;
       sku?: string;
       quantity: number;
       unit?: string;
+      baseCostPrice?: number;
       costPrice: number;
+      taxAmount?: number;
+      taxRate?: number;
       suggestedSellingPrice: number;
       hsn?: string;
+      requiresReview?: boolean;
+      reviewReason?: string;
     }>;
     rawTextPreview?: string;
     error?: string;

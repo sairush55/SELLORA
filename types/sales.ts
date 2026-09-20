@@ -36,6 +36,12 @@ export interface Sale {
   subtotal: number;
   discount: number;
   tax: number;
+  taxRate?: number;
+  applyGst?: boolean;
+  taxType?: 'cgst_sgst' | 'igst';
+  cgst?: number;
+  sgst?: number;
+  igst?: number;
   totalAmount: number;
   paymentMethod: PaymentMethod;
   customerName?: string;
@@ -59,6 +65,9 @@ export interface ProcessSaleInput {
   cartItems: POSCartItem[];
   discount?: number; // In ₹ INR
   tax?: number; // In ₹ INR
+  taxRate?: number;
+  applyGst?: boolean;
+  taxType?: 'cgst_sgst' | 'igst';
   paymentMethod: PaymentMethod;
   customerName?: string;
   customerPhone?: string;

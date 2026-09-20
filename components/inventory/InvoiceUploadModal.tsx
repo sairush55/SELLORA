@@ -51,6 +51,17 @@ export function InvoiceUploadModal({
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [supplierName, setSupplierName] = useState<string>("");
   const [invoiceDate, setInvoiceDate] = useState<string>("");
+  const [invoiceSummary, setInvoiceSummary] = useState<{
+    subtotal: number;
+    taxableAmount: number;
+    cgst: number;
+    sgst: number;
+    igst: number;
+    totalTax: number;
+    grandTotal: number;
+    isTaxInclusive: boolean;
+    effectiveTaxRate?: number;
+  } | null>(null);
   const [items, setItems] = useState<MatchedInvoiceItem[]>([]);
   const [filterMode, setFilterMode] = useState<"all" | "updates" | "new">("all");
 
@@ -66,6 +77,7 @@ export function InvoiceUploadModal({
     setIsProcessing(false);
     setErrorMessage(null);
     setItems([]);
+    setInvoiceSummary(null);
     setInvoiceNumber("");
     setSupplierName("");
   };
@@ -103,6 +115,7 @@ export function InvoiceUploadModal({
       setInvoiceNumber(res.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`);
       setSupplierName(res.supplierName || "Supplier Invoice");
       setInvoiceDate(res.date || new Date().toISOString().split("T")[0]);
+      setInvoiceSummary(res.summary || null);
 
       // Match against existing products
       const matched = invoiceParserService.matchInvoiceItems(shopId, res.items);
@@ -140,6 +153,7 @@ export function InvoiceUploadModal({
       setInvoiceNumber(res.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`);
       setSupplierName(res.supplierName || "Supplier Invoice");
       setInvoiceDate(res.date || new Date().toISOString().split("T")[0]);
+      setInvoiceSummary(res.summary || null);
 
       const matched = invoiceParserService.matchInvoiceItems(shopId, res.items);
       setItems(matched);
@@ -525,6 +539,26 @@ export function InvoiceUploadModal({
               </div>
             </div>
 
+            {/* Invoice GST Summary Strip */}
+            {invoiceSummary && invoiceSummary.totalTax > 0 && (
+              <div className="mx-4 mt-3 mb-1 px-3.5 py-2 rounded-xl bg-amber-50/80 border border-amber-200/90 text-xs flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded">
+                    GST Allocated
+                  </span>
+                  <span className="text-zinc-700 text-xs">
+                    Subtotal: <strong>{formatINR(invoiceSummary.subtotal)}</strong> • Invoice GST:{" "}
+                    <strong className="text-amber-800">+{formatINR(invoiceSummary.totalTax)}</strong>
+                    {invoiceSummary.effectiveTaxRate ? ` (~${invoiceSummary.effectiveTaxRate}%)` : ""} • Grand Total:{" "}
+                    <strong className="text-zinc-900">{formatINR(invoiceSummary.grandTotal)}</strong>
+                  </span>
+                </div>
+                <span className="text-[11px] font-medium text-amber-800">
+                  ✓ Extracted Cost Prices below include applicable GST
+                </span>
+              </div>
+            )}
+
             {/* Scrollable Table Area */}
             <div className="flex-1 overflow-y-auto p-4">
               <table className="w-full text-left text-xs border-collapse">
@@ -543,7 +577,7 @@ export function InvoiceUploadModal({
                     <th className="py-2.5 px-3">Category</th>
                     <th className="py-2.5 px-3 text-center">Invoiced Qty</th>
                     <th className="py-2.5 px-3 text-center">Stock Preview</th>
-                    <th className="py-2.5 px-3 text-right">Cost Price</th>
+                    <th className="py-2.5 px-3 text-right">Cost Price (incl. GST)</th>
                     <th className="py-2.5 px-3 text-right">Selling Price</th>
                     <th className="py-2.5 px-2 w-8 text-center"></th>
                   </tr>
@@ -682,21 +716,36 @@ export function InvoiceUploadModal({
                           )}
                         </td>
 
-                        {/* Cost Price */}
+                        {/* Cost Price (incl. GST) */}
                         <td className="py-3 px-3 text-right">
-                          <div className="inline-flex items-center gap-0.5">
-                            <span className="text-[11px] font-mono text-zinc-400">₹</span>
-                            <input
-                              type="number"
-                              min="0"
-                              value={item.costPrice}
-                              onChange={(e) =>
-                                updateItem(item.id, {
-                                  costPrice: Math.max(0, parseFloat(e.target.value) || 0),
-                                })
-                              }
-                              className="w-20 h-7 px-1 text-right font-mono text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
+                          <div className="flex flex-col items-end gap-0.5">
+                            <div className="inline-flex items-center gap-0.5">
+                              <span className="text-[11px] font-mono text-zinc-400">₹</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.costPrice}
+                                onChange={(e) =>
+                                  updateItem(item.id, {
+                                    costPrice: Math.max(0, parseFloat(e.target.value) || 0),
+                                  })
+                                }
+                                className="w-20 h-7 px-1 text-right font-mono text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+                            {item.taxAmount && item.taxAmount > 0 ? (
+                              <span className="text-[9px] font-mono text-amber-700 leading-none">
+                                incl. ₹{item.taxAmount} GST
+                              </span>
+                            ) : null}
+                            {item.requiresReview && (
+                              <span
+                                title={item.reviewReason || "Ambiguous GST calculation, please verify"}
+                                className="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded cursor-help"
+                              >
+                                ⚠️ Review Tax
+                              </span>
+                            )}
                           </div>
                         </td>
 

@@ -6,9 +6,26 @@ interface ExtractedInvoiceItem {
   sku?: string;
   quantity: number;
   unit: string;
-  costPrice: number;
+  baseCostPrice: number;
+  costPrice: number; // PURCHASE COST INCLUDING GST
+  taxAmount?: number; // GST amount per unit
+  taxRate?: number; // Effective GST % applied
   suggestedSellingPrice: number;
   hsn?: string;
+  requiresReview?: boolean;
+  reviewReason?: string;
+}
+
+export interface InvoiceFinancialSummary {
+  subtotal: number;
+  taxableAmount: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
+  totalTax: number;
+  grandTotal: number;
+  isTaxInclusive: boolean;
+  effectiveTaxRate?: number;
 }
 
 // Comprehensive Indian & Global retail unit normalizer
@@ -32,6 +49,131 @@ function parseNumeric(val: string | undefined): number {
   const cleaned = val.replace(/[^0-9.]/g, "");
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
+}
+
+// Extract bill-level summary (Subtotal, CGST, SGST, IGST, Grand Total)
+function extractInvoiceFinancialSummary(rawText: string): InvoiceFinancialSummary {
+  const lines = rawText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+
+  let subtotal = 0;
+  let taxableAmount = 0;
+  let cgst = 0;
+  let sgst = 0;
+  let igst = 0;
+  let totalTax = 0;
+  let grandTotal = 0;
+
+  for (const line of lines) {
+    const l = line.toLowerCase();
+
+    // 1. Subtotal / Taxable amount
+    if (
+      l.includes("subtotal") ||
+      l.includes("sub total") ||
+      l.includes("taxable value") ||
+      l.includes("taxable amount") ||
+      l.includes("total taxable")
+    ) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0 && subtotal === 0) {
+          subtotal = lastNum;
+          taxableAmount = lastNum;
+        }
+      }
+    }
+
+    // 2. CGST
+    if (l.includes("cgst")) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0) cgst = Math.max(cgst, lastNum);
+      }
+    }
+
+    // 3. SGST / UTGST
+    if (l.includes("sgst") || l.includes("utgst")) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0) sgst = Math.max(sgst, lastNum);
+      }
+    }
+
+    // 4. IGST
+    if (l.includes("igst")) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0) igst = Math.max(igst, lastNum);
+      }
+    }
+
+    // 5. Total GST / Total Tax
+    if (
+      l.includes("total gst") ||
+      l.includes("total tax") ||
+      l.includes("tax amount") ||
+      l.includes("gst total") ||
+      (l.startsWith("gst") && l.includes("total"))
+    ) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0) totalTax = Math.max(totalTax, lastNum);
+      }
+    }
+
+    // 6. Grand Total / Invoice Total / Net Amount
+    if (
+      l.includes("grand total") ||
+      l.includes("invoice total") ||
+      l.includes("net total") ||
+      l.includes("net amount") ||
+      l.includes("total amount") ||
+      l.includes("total payable") ||
+      l.includes("total invoice amount")
+    ) {
+      const nums = line.match(/(?:₹|rs\.?)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/gi);
+      if (nums && nums.length > 0) {
+        const lastNum = parseNumeric(nums[nums.length - 1]);
+        if (lastNum > 0) grandTotal = Math.max(grandTotal, lastNum);
+      }
+    }
+  }
+
+  // Derive total tax if not explicitly found
+  if (totalTax === 0) {
+    totalTax = Math.round((cgst + sgst + igst) * 100) / 100;
+  }
+
+  // Derive grand total if missing
+  if (grandTotal === 0 && subtotal > 0 && totalTax > 0) {
+    grandTotal = Math.round((subtotal + totalTax) * 100) / 100;
+  }
+
+  // Derive subtotal if missing
+  if (subtotal === 0 && grandTotal > 0 && totalTax > 0 && grandTotal > totalTax) {
+    subtotal = Math.round((grandTotal - totalTax) * 100) / 100;
+  }
+
+  const isTaxInclusive = totalTax > 0 || (grandTotal > subtotal && subtotal > 0);
+  const effectiveTaxRate =
+    subtotal > 0 && totalTax > 0 ? Math.round((totalTax / subtotal) * 1000) / 10 : undefined;
+
+  return {
+    subtotal: subtotal || 0,
+    taxableAmount: taxableAmount || subtotal || 0,
+    cgst,
+    sgst,
+    igst,
+    totalTax,
+    grandTotal: grandTotal || subtotal || 0,
+    isTaxInclusive,
+    effectiveTaxRate,
+  };
 }
 
 // Generate a clean SKU from product name if none detected
@@ -99,6 +241,7 @@ function parseInvoiceText(rawText: string): {
   supplierName?: string;
   date?: string;
   items: ExtractedInvoiceItem[];
+  summary: InvoiceFinancialSummary;
 } {
   const lines = rawText
     .split(/\r?\n/)
@@ -188,6 +331,7 @@ function parseInvoiceText(rawText: string): {
       sku: hsnCode ? `SKU-${hsnCode}` : generateSkuFromName(cleanName),
       quantity: qty,
       unit,
+      baseCostPrice: Math.round(rate * 100) / 100,
       costPrice: Math.round(rate * 100) / 100,
       suggestedSellingPrice,
       hsn: hsnCode,
@@ -377,11 +521,88 @@ function parseInvoiceText(rawText: string): {
     }
   }
 
+  // 3. Extract Bill-Level Financial & Tax Summary
+  const summary = extractInvoiceFinancialSummary(rawText);
+
+  // 4. Calculate Proportional GST-Inclusive Cost Price for Each Item
+  const totalItemsBaseAmount = items.reduce(
+    (sum, it) => sum + it.quantity * it.baseCostPrice,
+    0
+  );
+
+  let effectiveTaxToAllocate = 0;
+  if (summary.totalTax > 0) {
+    effectiveTaxToAllocate = summary.totalTax;
+  } else if (
+    summary.grandTotal > 0 &&
+    summary.subtotal > 0 &&
+    summary.grandTotal > summary.subtotal
+  ) {
+    effectiveTaxToAllocate = Math.round((summary.grandTotal - summary.subtotal) * 100) / 100;
+  } else if (
+    summary.grandTotal > 0 &&
+    totalItemsBaseAmount > 0 &&
+    summary.grandTotal > totalItemsBaseAmount + 1
+  ) {
+    effectiveTaxToAllocate = Math.round((summary.grandTotal - totalItemsBaseAmount) * 100) / 100;
+  }
+
+  // Ambiguity checks
+  let isAmbiguous = false;
+  let ambiguityReason = "";
+
+  if (summary.grandTotal > 0 && summary.subtotal > 0 && summary.totalTax > 0) {
+    const expectedTotal = summary.subtotal + summary.totalTax;
+    if (Math.abs(summary.grandTotal - expectedTotal) > 5) {
+      isAmbiguous = true;
+      ambiguityReason = `Invoice summary mismatch: Grand Total (₹${summary.grandTotal}) ≠ Subtotal + Tax (₹${expectedTotal}). Please verify item costs.`;
+    }
+  }
+
+  if (
+    totalItemsBaseAmount > 0 &&
+    summary.subtotal > 0 &&
+    Math.abs(totalItemsBaseAmount - summary.subtotal) > summary.subtotal * 0.25
+  ) {
+    isAmbiguous = true;
+    ambiguityReason = `Extracted items base total (₹${totalItemsBaseAmount}) differs significantly from invoice subtotal (₹${summary.subtotal}). Please verify item costs.`;
+  }
+
+  // Allocate tax to each item
+  for (const it of items) {
+    if (effectiveTaxToAllocate > 0 && totalItemsBaseAmount > 0) {
+      const itemBaseTotal = it.quantity * it.baseCostPrice;
+      const allocatedTax = (itemBaseTotal / totalItemsBaseAmount) * effectiveTaxToAllocate;
+      const taxPerUnit = Math.round((allocatedTax / it.quantity) * 100) / 100;
+      const inclusiveCost = Math.round((it.baseCostPrice + taxPerUnit) * 100) / 100;
+      const effectiveRate =
+        it.baseCostPrice > 0 ? Math.round((taxPerUnit / it.baseCostPrice) * 1000) / 10 : 0;
+
+      it.costPrice = inclusiveCost;
+      it.taxAmount = taxPerUnit;
+      it.taxRate = effectiveRate;
+      it.suggestedSellingPrice = Math.max(
+        Math.round(inclusiveCost * 1.25),
+        Math.round(inclusiveCost + 1)
+      );
+    } else {
+      it.costPrice = it.baseCostPrice;
+      it.taxAmount = 0;
+      it.taxRate = 0;
+    }
+
+    if (isAmbiguous) {
+      it.requiresReview = true;
+      it.reviewReason = ambiguityReason;
+    }
+  }
+
   return {
     invoiceNumber: invoiceNumber || `INV-${Date.now().toString().slice(-6)}`,
     supplierName: supplierName || "Supplier Invoice",
     date: date || new Date().toISOString().split("T")[0],
     items,
+    summary,
   };
 }
 
@@ -507,6 +728,7 @@ export async function POST(req: NextRequest) {
       supplierName: parsed.supplierName,
       date: parsed.date,
       items: parsed.items,
+      summary: parsed.summary,
       rawTextPreview: fullText.slice(0, 600),
     });
   } catch (error: any) {

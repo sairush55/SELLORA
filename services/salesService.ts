@@ -144,12 +144,32 @@ export const salesService = {
     // Calculate totals
     const subtotal = input.cartItems.reduce((sum, item) => sum + item.subtotal, 0);
     const discount = Math.max(0, Number(input.discount) || 0);
-    const taxRate = Number(input.tax) || 0; // Tax in % or fixed ₹
-    // If tax <= 28, interpret as % GST, otherwise fixed amount
-    const taxAmount =
-      taxRate <= 28
-        ? Math.round(((subtotal - discount) * taxRate) / 100)
-        : Math.round(taxRate);
+
+    // Optional GST
+    const applyGst = Boolean(input.applyGst);
+    let taxAmount = 0;
+    let taxRate = 0;
+    let taxType: "cgst_sgst" | "igst" | undefined = undefined;
+    let cgst = 0;
+    let sgst = 0;
+    let igst = 0;
+
+    if (applyGst) {
+      taxRate = Number(input.taxRate) || 5;
+      taxType = input.taxType || "cgst_sgst";
+      taxAmount =
+        input.tax !== undefined
+          ? Math.max(0, Number(input.tax) || 0)
+          : Math.round(((subtotal - discount) * taxRate) / 100);
+
+      if (taxType === "cgst_sgst") {
+        cgst = Math.round((taxAmount / 2) * 100) / 100;
+        sgst = Math.round((taxAmount / 2) * 100) / 100;
+      } else {
+        igst = taxAmount;
+      }
+    }
+
     const totalAmount = Math.max(0, subtotal - discount + taxAmount);
 
     // 4. Create Sale Items
@@ -186,6 +206,12 @@ export const salesService = {
       subtotal,
       discount,
       tax: taxAmount,
+      taxRate: applyGst ? taxRate : 0,
+      applyGst,
+      taxType,
+      cgst,
+      sgst,
+      igst,
       totalAmount,
       paymentMethod: input.paymentMethod,
       customerName: input.customerName?.trim() ? input.customerName.trim() : undefined,
