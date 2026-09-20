@@ -574,7 +574,6 @@ export function InvoiceUploadModal({
                     </th>
                     <th className="py-2.5 px-3">Product Name & SKU</th>
                     <th className="py-2.5 px-3">Action</th>
-                    <th className="py-2.5 px-3">Category</th>
                     <th className="py-2.5 px-3 text-center">Invoiced Qty</th>
                     <th className="py-2.5 px-3 text-center">Stock Preview</th>
                     <th className="py-2.5 px-3 text-right">Cost Price (incl. GST)</th>
@@ -656,31 +655,6 @@ export function InvoiceUploadModal({
                           )}
                         </td>
 
-                        {/* Category */}
-                        <td className="py-3 px-3">
-                          {isUpdate ? (
-                            <span className="text-zinc-600 text-xs">{item.categoryName || "General"}</span>
-                          ) : (
-                            <select
-                              value={item.categoryId}
-                              onChange={(e) =>
-                                updateItem(item.id, {
-                                  categoryId: e.target.value,
-                                  categoryName:
-                                    categories.find((c) => c.id === e.target.value)?.name ||
-                                    "General",
-                                })
-                              }
-                              className="h-7 px-2 text-xs rounded border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                            >
-                              {categories.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                  {c.name}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                        </td>
 
                         {/* Invoiced Quantity */}
                         <td className="py-3 px-3 text-center">
