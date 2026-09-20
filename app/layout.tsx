@@ -6,7 +6,7 @@ import { SplashScreen } from "@/components/branding/SplashScreen";
 import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 
 export const viewport: Viewport = {
-  themeColor: "#059669",
+  themeColor: "#eab308",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
